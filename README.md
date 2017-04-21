@@ -2,10 +2,10 @@
 
 # Customization
 To customize this repository for your project, you'll have to do the following:
-- customize config.mk
-- customize this README
-- change the copyright holder in LICENSE, src/main.lua and src/menu.lua
-- change the name of the game in the following places:
+1. customize config.mk
+2. customize this README
+3. change the copyright holder in LICENSE, src/main.lua and src/menu.lua
+4. change the name of the game in the following places:
  - release/linux/launch.sh (game title, aka $GAME)
  - release/mac/ld-38.app (the name of this directory)
  - release/mac/ld-38.app/Info.plist (all places marked with #XXX)
