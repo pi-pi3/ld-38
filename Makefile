@@ -9,7 +9,7 @@ all: love linux windows mac
 
 love:
 	@echo "Creating love file..."
-	rm release/$(GAME).love
+	rm -f release/$(GAME).love
 	cd src; zip -9 -r ../release/$(GAME).love *.lua
 	zip -9 -r release/$(GAME).love assets LICENSE README.md
 	@echo "Done."
@@ -31,3 +31,10 @@ mac:
 
 push:
 	@./butler.sh $(GAME) $(VERSION) $(ITCH) $(LINUX_PATH) $(WINDOWS_PATH) $(MAC_PATH)
+
+clean: 
+	rm -f release/$(GAME).love
+	rm -f $(LINUX_NAME)
+	rm -f $(WINDOWS_NAME)
+	rm -f $(MAC_NAME)/Contents/Resources/$(GAME).love
+

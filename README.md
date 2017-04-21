@@ -4,10 +4,17 @@
 - `util.lua` General purpose utilities for games (doesn't require löve).
 - `lgui.lua` General purpose gui for games (requires löve).
 
+## util.lua
+Most functions are documented and are so tiny, they're rather easy to understand.
+
+## lgui.lua
+Literally 10 comments in the entire file. I will document it sometime. For now,
+look at how `src/menu.lua` uses `lgui` and launch the test suite using `love src`.
+
 ## Customization
 To customize this repository for your project, you'll have to do the following:
-1. customize config.mk
-2. customize this README
+1. customize this README
+2. customize config.mk
 3. change the copyright holder in LICENSE, src/main.lua and src/menu.lua
 4. change the name of the game in the following places:
  - release/linux/launch.sh (game title, aka $GAME)
