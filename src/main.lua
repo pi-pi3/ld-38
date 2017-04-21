@@ -23,7 +23,7 @@
 ]]
 
 local util = require('util')
-local gui = require('gui')
+local lgui = require('lgui')
 declare = util.declare -- global alias for declare, should work in every file
 
 function love.load()
@@ -51,7 +51,7 @@ function love.update(dt)
         game.state.update(dt)
     end
 
-    gui.updateall(game.state.elements)
+    lgui.updateall(game.state.elements)
 end
 
 function love.draw()
@@ -61,7 +61,7 @@ function love.draw()
         game.state.draw(dt)
     end
 
-    gui.drawall(game.state.elements)
+    lgui.drawall(game.state.elements)
 end
 
 
@@ -73,7 +73,7 @@ function love.mousepressed(mx, my, button)
     end
 
     if button == 1 then
-        gui.mousepressed(game.state.elements, mx, my)
+        lgui.mousepressed(game.state.elements, mx, my)
     end
 end
 
@@ -84,7 +84,7 @@ function love.mousereleased(mx, my, button)
     end
 
     if button == 1 then
-        gui.mousereleased(game.state.elements, mx, my)
+        lgui.mousereleased(game.state.elements, mx, my)
     end
 end
 
@@ -94,7 +94,7 @@ function love.mousemoved(mx, my, dx, dy)
         game.state.mousemoved(mx, my, dx, dy)
     end
 
-    gui.mousemoved(game.state.elements, mx, my, dx, dy)
+    lgui.mousemoved(game.state.elements, mx, my, dx, dy)
 end
 
 function love.wheelmoved(dx, dy)
@@ -103,7 +103,7 @@ function love.wheelmoved(dx, dy)
         game.state.wheelmoved(dx, dy)
     end
 
-    gui.wheelmoved(game.state.elements, dx, dy)
+    lgui.wheelmoved(game.state.elements, dx, dy)
 end
 
 function love.textinput(c)
@@ -112,7 +112,7 @@ function love.textinput(c)
         game.state.textinput(mx, my, dx, dy)
     end
 
-    gui.textinput(game.state.elements, c)
+    lgui.textinput(game.state.elements, c)
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -121,7 +121,7 @@ function love.keypressed(key, scancode, isrepeat)
         game.state.keypressed(key, scancode, isrepeat)
     end
 
-    gui.keypressed(game.state.elements, key, scancode, isrepeat)
+    lgui.keypressed(game.state.elements, key, scancode, isrepeat)
 end
 
 function love.quit()

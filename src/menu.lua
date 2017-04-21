@@ -22,14 +22,14 @@
     distribution.
 ]]
 
-local gui = require('gui')
+local lgui = require('lgui')
 
 local menu = {}
 
 function menu.load()
     menu.elements = {}
 
-    table.insert(menu.elements, gui.label(
+    table.insert(menu.elements, lgui.label(
         {
             text = "Ludum Dare game",
             color = {255, 255, 255},
@@ -37,7 +37,7 @@ function menu.load()
             align = 'center',
         }))
 
-    table.insert(menu.elements, gui.button(
+    table.insert(menu.elements, lgui.button(
         {
             text = "Ludum",
             bgcolor = {255, 255, 255},
@@ -48,7 +48,7 @@ function menu.load()
             onRelease = function() print('noclick') end,
         }))
 
-    table.insert(menu.elements, gui.button(
+    table.insert(menu.elements, lgui.button(
         {
             text = "Dare",
             bgcolor = {255, 255, 255},
@@ -58,14 +58,14 @@ function menu.load()
             onHold = function() print('hold') end,
         }))
 
-    table.insert(menu.elements, gui.slider(
+    table.insert(menu.elements, lgui.slider(
         {
             color = {255, 255, 255},
             x = 16, y = 80,
             width = 64, height = 8,
         }))
 
-    table.insert(menu.elements, gui.slider(
+    table.insert(menu.elements, lgui.slider(
         {
             color = {255, 255, 255},
             x = 16, y = 100,
@@ -75,7 +75,7 @@ function menu.load()
             value = 127,
         }))
 
-    table.insert(menu.elements, gui.checkbox(
+    table.insert(menu.elements, lgui.checkbox(
         {
             bgcolor = {255, 255, 255},
             x = 48, y = 120,
@@ -83,7 +83,7 @@ function menu.load()
             value = false,
         }))
 
-    table.insert(menu.elements, gui.checkbox(
+    table.insert(menu.elements, lgui.checkbox(
         {
             bgcolor = {255, 255, 255},
             x = 16, y = 120,
@@ -91,7 +91,7 @@ function menu.load()
             value = true,
         }))
 
-    table.insert(menu.elements, gui.container(
+    table.insert(menu.elements, lgui.container(
         {
             bgcolor = {255, 255, 255},
             x = 100, y = 80,
@@ -99,7 +99,7 @@ function menu.load()
             maxscroll = {x0 = -32, x1 = 32,
                          y0 = -32, y1 = 32},
             elements = {
-                gui.label(
+                lgui.label(
                     {
                         text = "Dare to play?\n"..
                                "Just press \n"..
@@ -107,7 +107,7 @@ function menu.load()
                         color = {0, 0, 0},
                         x = 0, y = 0,
                     }),
-                gui.button(
+                lgui.button(
                     {
                         text = "Play",
                         textcolor = {255, 255, 255},
@@ -121,7 +121,7 @@ function menu.load()
             },
         }))
 
-    table.insert(menu.elements, gui.textfield(
+    table.insert(menu.elements, lgui.textfield(
         {
             bgcolor = {255, 255, 255},
             x = 32, y = 256,
@@ -129,7 +129,7 @@ function menu.load()
             text = 'type something...',
         }))
 
-    table.insert(menu.elements, gui.list(
+    table.insert(menu.elements, lgui.list(
         {
             bgcolor = {255, 255, 255},
             x = 150, y = 256,

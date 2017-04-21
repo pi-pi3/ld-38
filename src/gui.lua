@@ -1,5 +1,5 @@
 
---[[ gui.lua A minimalistic GUI library useful for games.
+--[[ lgui.lua A minimalistic GUI library useful for games.
     Copyright (c) 2017 Szymon "pi_pi3" Walter
 
     This software is provided 'as-is', without any express or implied
@@ -25,9 +25,9 @@
 local math = require('math')
 local util = require('util')
 
-local gui = {}
+local lgui = {}
 
-function gui.label(prot)
+function lgui.label(prot)
     prot = prot or {}
 
     local label = {}
@@ -55,12 +55,12 @@ function gui.label(prot)
     label.onHover = prot.onHover
     label.onHold = prot.onHold
 
-    label.draw = prot.draw or gui.draw_label
+    label.draw = prot.draw or lgui.draw_label
 
     return label
 end
 
-function gui.image(prot)
+function lgui.image(prot)
     prot = prot or {}
 
     local image = {}
@@ -84,12 +84,12 @@ function gui.image(prot)
     image.onHover = prot.onHover
     image.onHold = prot.onHold
 
-    image.draw = prot.draw or gui.draw_image
+    image.draw = prot.draw or lgui.draw_image
 
     return image
 end
 
-function gui.button(prot)
+function lgui.button(prot)
     prot = prot or {}
 
     local button = {}
@@ -125,12 +125,12 @@ function gui.button(prot)
     button.onHover = prot.onHover
     button.onHold = prot.onHold
 
-    button.draw = prot.draw or gui.draw_button
+    button.draw = prot.draw or lgui.draw_button
 
     return button
 end
 
-function gui.slider(prot)
+function lgui.slider(prot)
     prot = prot or {}
 
     local slider = {}
@@ -172,13 +172,13 @@ function gui.slider(prot)
                          {sw/2, 0},
                          {0, -sh/2}})
 
-    slider.draw = prot.draw or gui.draw_slider
-    slider.update = gui.update_slider
+    slider.draw = prot.draw or lgui.draw_slider
+    slider.update = lgui.update_slider
 
     return slider
 end
 
-function gui.checkbox(prot)
+function lgui.checkbox(prot)
     prot = prot or {}
 
     local checkbox = {}
@@ -206,12 +206,12 @@ function gui.checkbox(prot)
     checkbox.onHover = prot.onHover
     checkbox.onHold = prot.onHold
 
-    checkbox.draw = prot.draw or gui.draw_checkbox
+    checkbox.draw = prot.draw or lgui.draw_checkbox
 
     return checkbox
 end
 
-function gui.container(prot)
+function lgui.container(prot)
     prot = prot or {}
 
     local container = {}
@@ -242,13 +242,13 @@ function gui.container(prot)
     container.onHover = prot.onHover
     container.onHold = prot.onHold
 
-    container.draw = prot.draw or gui.draw_container
-    container.update = gui.update_container
+    container.draw = prot.draw or lgui.draw_container
+    container.update = lgui.update_container
 
     return container
 end
 
-function gui.textfield(prot)
+function lgui.textfield(prot)
     prot = prot or {}
 
     local textfield = {}
@@ -279,12 +279,12 @@ function gui.textfield(prot)
     textfield.onHover = prot.onHover
     textfield.onHold = prot.onHold
 
-    textfield.draw = prot.draw or gui.draw_textfield
+    textfield.draw = prot.draw or lgui.draw_textfield
 
     return textfield
 end
 
-function gui.list(prot)
+function lgui.list(prot)
     prot = prot or {}
 
     local list = {}
@@ -325,12 +325,12 @@ function gui.list(prot)
     list.onHover = prot.onHover
     list.onHold = prot.onHold
 
-    list.draw = prot.draw or gui.draw_list
+    list.draw = prot.draw or lgui.draw_list
 
     return list
 end
 
-function gui.printf(e, text, font, color, vcenter, align)
+function lgui.printf(e, text, font, color, vcenter, align)
     if not e.text or text then
         return
     end
@@ -354,15 +354,15 @@ function gui.printf(e, text, font, color, vcenter, align)
     love.graphics.printf(e.text, e.x, y, e.width, align)
 end
 
-function gui.draw_label(self)
-    gui.printf(self)
+function lgui.draw_label(self)
+    lgui.printf(self)
 end
 
-function gui.draw_image(self)
+function lgui.draw_image(self)
     love.graphics.draw(self.img, self.quad, self.x, self.y, self.r)
 end
 
-function gui.draw_button(self)
+function lgui.draw_button(self)
     if self.down then
         love.graphics.setColor(self.downcolor)
     else
@@ -374,10 +374,10 @@ function gui.draw_button(self)
     love.graphics.setLineStyle('smooth')
     love.graphics.setLineWidth(self.line_width)
 
-    gui.printf(self, nil, nil, nil, true, nil)
+    lgui.printf(self, nil, nil, nil, true, nil)
 end
 
-function gui.draw_slider(self)
+function lgui.draw_slider(self)
     love.graphics.setColor(self.color)
     love.graphics.setLineStyle('smooth')
     love.graphics.setLineWidth(self.line_width)
@@ -396,7 +396,7 @@ function gui.draw_slider(self)
                          self.width, 'center')
 end
 
-function gui.draw_checkbox(self)
+function lgui.draw_checkbox(self)
     love.graphics.setColor(self.bgcolor)
     love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
 
@@ -414,7 +414,7 @@ function gui.draw_checkbox(self)
     end
 end
 
-function gui.draw_container(self)
+function lgui.draw_container(self)
     local function draw_stencil()
         love.graphics.rectangle('fill', self.x, self.y,
                                 self.width, self.height)
@@ -435,13 +435,13 @@ function gui.draw_container(self)
     love.graphics.translate(self.x + self.scroll.x, self.y + self.scroll.y)
 
     love.graphics.setStencilTest('greater', 0)
-    gui.drawall(self.elements)
+    lgui.drawall(self.elements)
     love.graphics.setStencilTest()
 
     love.graphics.translate(-(self.x + self.scroll.x), -(self.x + self.scroll.y))
 end
 
-function gui.draw_textfield(self)
+function lgui.draw_textfield(self)
     local function draw_stencil()
         love.graphics.rectangle('fill', self.x, self.y,
                                 self.width, self.height)
@@ -468,14 +468,14 @@ function gui.draw_textfield(self)
     local offset = self.font:getWidth('|') -- arbitrary offset to make
                                            -- textfields more pleasant to read
 
-    gui.printf({text = text, x = self.x+offset, y = self.y+offset,
+    lgui.printf({text = text, x = self.x+offset, y = self.y+offset,
                 width = self.width, height = self.height,
                 font = self.font, color = self.textcolor})
 
     love.graphics.setStencilTest()
 end
 
-function gui.draw_list(self)
+function lgui.draw_list(self)
     local offset = self.font:getWidth('|') -- arbitrary offset to make
                                            -- textfields more pleasant to read
 
@@ -515,7 +515,7 @@ function gui.draw_list(self)
                                         self.width, height)
             end
 
-            gui.printf({text = v.key, x = self.x+offset, y = y+offset,
+            lgui.printf({text = v.key, x = self.x+offset, y = y+offset,
                         width = self.width, height = self.height,
                         font = self.font, color = self.textcolor})
 
@@ -542,7 +542,7 @@ function gui.draw_list(self)
         love.graphics.stencil(draw_stencil)
         love.graphics.setStencilTest('greater', 0)
 
-        gui.printf({text = self.selection.key,
+        lgui.printf({text = self.selection.key,
                     x = self.x+offset, y = self.y+offset,
                     width = self.width, height = self.height,
                     font = self.font, color = self.textcolor})
@@ -551,7 +551,7 @@ function gui.draw_list(self)
     end
 end
 
-function gui.interaction(e, mx, my, callback)
+function lgui.interaction(e, mx, my, callback)
     if not callback or e.pause then
         return
     end
@@ -562,7 +562,7 @@ function gui.interaction(e, mx, my, callback)
     end
 end
 
-function gui.mousepressed(elements, mx, my)
+function lgui.mousepressed(elements, mx, my)
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.x and e.y and e.width and e.height
@@ -577,7 +577,7 @@ function gui.mousepressed(elements, mx, my)
                     e.focus = true
                     love.keyboard.setTextInput(true)
                 elseif e.t == 'container' then
-                    gui.mousepressed(e.elements,
+                    lgui.mousepressed(e.elements,
                                      mx-e.x-e.scroll.x, my-e.y-e.scroll.y)
                 end
 
@@ -621,11 +621,11 @@ function list_getsel(e, my)
     end
 end
 
-function gui.mousereleased(elements, mx, my)
+function lgui.mousereleased(elements, mx, my)
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'container' then
-                gui.mousereleased(e.elements,
+                lgui.mousereleased(e.elements,
                                   mx-e.x-e.scroll.x, my-e.y-e.scroll.y)
             elseif e.t == 'list' then
                 local height = (e.toggle and e.focus_height or e.height)
@@ -667,7 +667,7 @@ function gui.mousereleased(elements, mx, my)
     end
 end
 
-function gui.mousemoved(elements, mx, my, dx, dy)
+function lgui.mousemoved(elements, mx, my, dx, dy)
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'container' and e.down then
@@ -684,7 +684,7 @@ function gui.mousemoved(elements, mx, my, dx, dy)
 
 
             if e.t == 'container' and e.active then
-                gui.mousemoved(e.elements,
+                lgui.mousemoved(e.elements,
                                mx-e.x-e.scroll.x, my-e.y-e.scroll.y,
                                dx, dy)
             end
@@ -692,7 +692,7 @@ function gui.mousemoved(elements, mx, my, dx, dy)
     end
 end
 
-function gui.wheelmoved(elements, dx, dy, x, y)
+function lgui.wheelmoved(elements, dx, dy, x, y)
     local mx, my = love.mouse.getPosition()
     if x then mx = mx + x end
     if y then my = my + y end
@@ -711,7 +711,7 @@ function gui.wheelmoved(elements, dx, dy, x, y)
                                             e.maxscroll.y1)
                 end
                 if e.t == 'container' then
-                    gui.wheelmoved(e.elements, dx, dy,
+                    lgui.wheelmoved(e.elements, dx, dy,
                                    -e.x-e.scroll.x, -e.y-e.scroll.y)
                 end
             end
@@ -729,19 +729,19 @@ function gui.wheelmoved(elements, dx, dy, x, y)
     end
 end
 
-function gui.textinput(elements, c)
+function lgui.textinput(elements, c)
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'textfield' and e.focus then
                 e.text = e.text .. c
             elseif e.t == 'container' then
-                gui.textinput(e.elements, c)
+                lgui.textinput(e.elements, c)
             end
         end
     end
 end
 
-function gui.keypressed(elements, key, scancode, isrepeat)
+function lgui.keypressed(elements, key, scancode, isrepeat)
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'textfield' and e.focus then
@@ -753,7 +753,7 @@ function gui.keypressed(elements, key, scancode, isrepeat)
                     e.text = e.text .. '\n'
                 end
             elseif e.t == 'container' then
-                gui.keypressed(e.elements, key, scancode, isrepeat)
+                lgui.keypressed(e.elements, key, scancode, isrepeat)
             end
         end
     end
@@ -774,7 +774,7 @@ function gui.keypressed(elements, key, scancode, isrepeat)
     end
 end
 
-function gui.update_slider(self, mx, my)
+function lgui.update_slider(self, mx, my)
     if self.down
         and mx >= self.x and mx <= self.x+self.width
         and my >= self.y and my <= self.y+self.height then
@@ -794,11 +794,11 @@ function gui.update_slider(self, mx, my)
     end
 end
 
-function gui.update_container(self, mx, my)
-    gui.updateall(self.elements, -self.x-self.scroll.x, -self.y-self.scroll.y)
+function lgui.update_container(self, mx, my)
+    lgui.updateall(self.elements, -self.x-self.scroll.x, -self.y-self.scroll.y)
 end
 
-function gui.updateall(elements, x, y)
+function lgui.updateall(elements, x, y)
     if not elements then
         return
     end
@@ -814,12 +814,12 @@ function gui.updateall(elements, x, y)
             end
 
             local callback = e.down and e.onHold or e.onHover
-            gui.interaction(e, mx, my, callback)
+            lgui.interaction(e, mx, my, callback)
         end
     end
 end
 
-function gui.drawall(elements)
+function lgui.drawall(elements)
     if not elements then
         return
     end
@@ -843,4 +843,4 @@ function gui.drawall(elements)
     end
 end
 
-return gui
+return lgui

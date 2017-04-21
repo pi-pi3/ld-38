@@ -1,6 +1,10 @@
 # LD 38 game
 
-# Customization
+## included libraries:
+- `util.lua` General purpose utilities for games (doesn't require löve).
+- `lgui.lua` General purpose gui for games (requires löve).
+
+## Customization
 To customize this repository for your project, you'll have to do the following:
 1. customize config.mk
 2. customize this README
@@ -11,7 +15,7 @@ To customize this repository for your project, you'll have to do the following:
  - release/mac/ld-38.app/Info.plist (all places marked with #XXX)
  - src/conf.lua (t.identity and t.window.title)
 
-## **SPECIAL NOTE** concerning licenses
+### **SPECIAL NOTE** concerning licenses
 The license in both the LICENSE file and the src/main.lua and src/menu.lua files
 claims, that you're not allowed to claim you wrote this software. Since, at this
 moment - the 21st of April, this repository is just a template, you're allowed to
