@@ -13,7 +13,6 @@
 
 ## Pausing has Consequences
 - platformer, pausing pauses you, but not the world
-- Puzzle, upychasz ubrania do szafy bo Twoja dziewczyna niespodziewanie ma przyjść (coś jak pentomino) tylko że jedą rzecz musisz wysłać do innego wymiaru bo inaczej się nie zmieści
 
 ## Keep it Alive
 - tamagotchi-esque game
