@@ -47,7 +47,9 @@ function gfx.pop()
 end
 
 function gfx.identity()
-    cpml.mat4.identity(gfx.matrix())
+    local m = gfx.matrix()
+    cpml.mat4.identity(m)
+    shader:send('u_model', m:to_vec4s())
 end
 
 function gfx.projection(fov, aspect, n, f)

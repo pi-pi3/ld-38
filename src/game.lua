@@ -24,6 +24,7 @@
 
 local util = require('util')
 local cpml = require('cpml')
+local iqm = require('iqm')
 local world = require('world')
 
 local game = {}
@@ -49,6 +50,14 @@ function game.load()
     game.camera = {pos = cpml.vec3(0, 6, 10),
                    rot = cpml.vec3(2.6, 0, 0),
                    proj = gfx.projection(90, width/height, 0.1, 100)}
+
+    game.skybox = iqm.load('assets/models/skybox.iqm')
+    local skybox = love.graphics.newImage('assets/textures/skybox.tga',
+                                          {mipmaps = true})
+    skybox:setFilter('nearest', 'nearest')
+    game.skybox.textures = {
+        Materialskybox = skybox
+    }
 end
 
 function game.update(dt)
@@ -63,6 +72,16 @@ end
 
 function game.draw()
     gfx.identity()
+
+    l3d.set_depth_write(false)
+    -- skybox goes here
+    gfx.push()
+    gfx.camera(cpml.vec3(0, 0, 4), game.camera.rot, nil)
+
+    gfx.draw(game.skybox)
+    gfx.pop()
+    l3d.set_depth_write(true)
+
     gfx.camera(game.camera.pos, game.camera.rot, nil,
                game.world.entities.player.position)
 
