@@ -40,7 +40,7 @@ function love.load()
 
     -- initial game state is the menu, but you can change it into a splash
     -- screen for example
-    game.state = require('menu')
+    game.state = require('game')
     game.state.load()
 end
 

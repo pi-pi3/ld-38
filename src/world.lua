@@ -1,5 +1,5 @@
 
---[[ menu.lua
+--[[ world.lua
     Copyright (c) 2017 Szymon "pi_pi3" Walter, Szymon Bednarek
 
     This software is provided 'as-is', without any express or implied
@@ -22,12 +22,49 @@
     distribution.
 ]]
 
-local lgui = require('lgui')
+local util = require('util')
+local player = require('player')
+local block = require('block')
 
-local menu = {}
+local world = {}
+local mt = {__index = world}
 
-function menu.load()
-    menu.elements = {}
+function world.gen(w, h)
+    local self = {}
+    self.entities = {}
+    self.entities.player = player.new()
+
+    self.blocks = {}
+    blocks[1] = block.new(1)
+
+    self.world = {} -- rename this
+    self.width = w
+    self.height = h
+
+    for i = 1, self.height do
+        self.world[i] = {}
+        for j = 1, self.width do
+            self.world[i][j] = 1
+        end
+    end
+
+    return self
 end
 
-return menu
+function world:draw()
+    for i = 1, self.height do
+        local y = i-4
+        for j = 1, self.width do
+            local x = j-4
+            local t = self.world[i][j]
+            
+            blocks[t]:draw(x, y)
+        end
+    end
+
+    for _, e in pairs(self.entities) do
+        if e.draw then
+            e:draw()
+        end
+    end
+end

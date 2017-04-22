@@ -1,5 +1,5 @@
 
---[[ menu.lua
+--[[ block.lua
     Copyright (c) 2017 Szymon "pi_pi3" Walter, Szymon Bednarek
 
     This software is provided 'as-is', without any express or implied
@@ -22,12 +22,42 @@
     distribution.
 ]]
 
-local lgui = require('lgui')
+local util = require('util')
+local iqm = require('iqm')
+local cpml = require('iqm')
 
-local menu = {}
+local block = {}
+local mt = {__index = block}
 
-function menu.load()
-    menu.elements = {}
+function block.new(block_type)
+    block_type = block_type or 1
+
+    local self = {}
+
+    if block_type == 1 then
+        self.model = iqm.load('assets/models/block.iqm')
+    end
+
+    return self
 end
 
-return menu
+function block:draw(x, y, z)
+    local pos
+    if x and not y and not z then
+        pos = x
+    elseif x and y then
+        pos = cpml.vec3(x, y, z or 0)
+    end
+
+    love.graphics.push('transform')
+
+    cpml.mat4f.translate(transform_matrix, transform_matrix, pos)
+    -- only z
+    cpml.mat4f.rotate(transform_matrix, transform_matrix,
+                      -self.rotation, cpml.vec3(0, 0, 1))
+    game.shader:send('u_model', transform_matrix)
+
+    love.graphics.draw(self.model.mesh)
+
+    love.graphics.pop()
+end

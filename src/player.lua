@@ -1,5 +1,5 @@
 
---[[ menu.lua
+--[[ player.lua
     Copyright (c) 2017 Szymon "pi_pi3" Walter, Szymon Bednarek
 
     This software is provided 'as-is', without any express or implied
@@ -22,12 +22,32 @@
     distribution.
 ]]
 
-local lgui = require('lgui')
+local util = require('util')
+local iqm = require('iqm')
+local cpml = require('iqm')
 
-local menu = {}
+local player = {}
+local mt = {__index = player}
 
-function menu.load()
-    menu.elements = {}
+function player.new(x, y)
+    local self = {}
+    self.position = cpml.vec3(x or 0, y or 0, z)
+    self.rotation = 0 -- z only
+    self.model = iqm.load('assets/models/player.iqm')
+
+    return self
 end
 
-return menu
+function player:draw()
+    love.graphics.push('transform')
+
+    cpml.mat4f.translate(transform_matrix, transform_matrix, self.position)
+    -- only z
+    cpml.mat4f.rotate(transform_matrix, transform_matrix,
+                      self.rotation, cpml.vec3(0, 0, 1))
+    game.shader:send('u_model', transform_matrix)
+
+    love.graphics.draw(self.model.mesh)
+
+    love.graphics.pop()
+end
