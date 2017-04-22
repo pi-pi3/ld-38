@@ -57,9 +57,9 @@ function enemy.new(x, y, z)
     self.health = 1000.0
 
     self.state = 'idle'
-    self.search = {timer = 0,
-                   rot = 0,
-                   dst = {}}
+    self.searching = {timer = 0,
+                      rot = 0,
+                      dst = {}}
 
     self.scale = cpml.vec3(1, 1, 1)
     self.model = iqm.load('assets/models/enemy.iqm')
@@ -80,7 +80,7 @@ function enemy:draw()
 end
 
 function enemy:update(dt)
-    local player = game.state.entities.player
+    local player = game.state.world.entities.player
 
     if self.state == 'idle' then 
         self:idle(dt, player)
@@ -90,11 +90,6 @@ function enemy:update(dt)
         self:attack(dt, player)
     elseif self.state == 'fleeing' then 
         self:flee(dt, player)
-    end
-
-    self.rotation = math.asin(self.velocity.x)
-    if self.velocity.x > 0 then
-        self.rotation = -self.rotation+math.pi
     end
 
     local vx = self.velocity.x*dt
@@ -111,9 +106,9 @@ function enemy:idle(dt, player)
 
     if distance < 64.0 then
         self.state = 'searching' -- XXX Did I hear something?
-        self.search.timer = 0
-        self.search.rot = 0
-        self.search.dst = player.position
+        self.searching.timer = 0
+        self.searching.rot = 0
+        self.searching.dst = player.position
     end
 
     self.velocity = cpml.vec2(0, 0)
@@ -129,12 +124,13 @@ function enemy:search(dt, player)
     elseif distance < 16.0 then
         self.state = 'attacking'
     else -- Walk into players general direction
-        self.search.rot = math.sin(self.search.timer)
-        self.search.timer = self.search.timer + dt
+        self.searching.rot = math.sin(self.searching.timer)
+        self.searching.timer = self.searching.timer + dt
 
-        if self.timer > 1.5 then -- Lookup player's position once every 1.5 seconds
-            self.search.timer = self.search.timer
-            self.search.dst = player.position
+        -- Lookup player's position once every 1.5 seconds
+        if self.searching.timer > 1.5 then
+            self.searching.timer = self.searching.timer
+            self.searching.dst = player.position
         end
 
         local v = d:normalize() -- XXX I think there's something there...
@@ -145,27 +141,45 @@ function enemy:search(dt, player)
             rot = -math.asin(v.x)+math.pi
         end
 
-        rot = rot + self.search.rot
+        rot = rot + self.searching.rot
 
-        self.velocity = cpml.vec2(-math.sin(rot), -math.cos(rot))
+        self.velocity = cpml.vec2(math.sin(rot), -math.cos(rot))
+    end
+
+    local d = self.velocity:normalize()
+    self.rotation = math.asin(d.x)
+    if d.x > 0 then
+        self.rotation = -self.rotation+math.pi
     end
 end
 
 function enemy:attack(dt, player)
     local d = player.position - self.position
     local distance = cpml.vec3.len2(d)
+    d = d:normalize()
 
     if distance > 64.0 then
         self.state = 'idle' -- XXX He's too far, let's forget he exists.
         self.velocity = cpml.vec2(0, 0)
     elseif distance > 6.25 then
-        self.velocity = d:normalize()*2 -- XXX GET HIM!
+        self.velocity = d*2 -- XXX GET HIM!
+
+        self.rotation = math.asin(d.x)
+        if d.x > 0 then
+            self.rotation = -self.rotation+math.pi
+        end
     else
         -- attack
         self.velocity = cpml.vec2(0, 0)
+
+        self.rotation = math.asin(d.x)
+        if d.x > 0 then
+            self.rotation = -self.rotation+math.pi
+        end
     end
 
     if self.health < 100.0 then
+        self.state = 'fleeing'
     end
 end
 
@@ -178,6 +192,12 @@ function enemy:flee(dt, player)
         self.velocity = cpml.vec2(0, 0)
     else
         self.velocity = -d:normalize()*2 -- XXX RUN AWAY!
+
+        local d = self.velocity:normalize()
+        self.rotation = math.asin(d.x)
+        if d.x > 0 then
+            self.rotation = -self.rotation+math.pi
+        end
     end
 end
 

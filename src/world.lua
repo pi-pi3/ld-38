@@ -24,6 +24,7 @@
 
 local util = require('util')
 local player = require('player')
+local enemy = require('enemy')
 local block = require('block')
 
 local world = {}
@@ -35,6 +36,8 @@ function world.gen(w, h)
 
     self.entities = {}
     self.entities.player = player.new(0, 0, 2)
+
+    table.insert(self.entities, enemy.new(8, 8, 2))
 
     self.blocks = {}
     self.blocks[1] = block.new(1)
@@ -54,7 +57,11 @@ function world.gen(w, h)
 end
 
 function world:update(dt)
-    self.entities.player:update(dt)
+    for _, e in pairs(self.entities) do
+        if e.update then
+            e:update(dt)
+        end
+    end
 end
 
 function world:draw()
