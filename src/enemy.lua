@@ -48,11 +48,18 @@ function enemy.new(x, y, z)
     local self = {}
     setmetatable(self, mt)
 
+    self.t = 'enemy'
+
     self.velocity = cpml.vec2(0, 0)
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
+    self.scale = cpml.vec3(1, 1, 1)
 
-    self.health = 1000.0
+    self.health = 12
+    self.strength = 2
+    self.power = 2
+    self.agility = 3
+    self.defense = 1
 
     self.state = 'idle'
     self.searching = {timer = 0,
@@ -109,6 +116,11 @@ function enemy:idle(dt, player)
         self.searching.dst = player.position
     end
 
+    -- TODO: make this into 1/4 max hp
+    if self.health < 3.0 then
+        self.state = 'fleeing'
+    end
+
     self.velocity = cpml.vec2(0, 0)
 end
 
@@ -139,6 +151,11 @@ function enemy:search(dt, player)
         self.velocity = cpml.vec2(math.sin(rot), -math.cos(rot))
     end
 
+    -- TODO: make this into 1/4 max hp
+    if self.health < 3.0 then
+        self.state = 'fleeing'
+    end
+
     local d = self.velocity:normalize()
     self.rotation = math.asin(d.x)
     if d.x > 0 then
@@ -165,7 +182,8 @@ function enemy:attack(dt, player)
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     end
 
-    if self.health < 100.0 then
+    -- TODO: make this into 1/4 max hp
+    if self.health < 3.0 then
         self.state = 'fleeing'
     end
 end
@@ -180,8 +198,16 @@ function enemy:flee(dt, player)
     else
         self.velocity = -d:normalize()*2 -- XXX RUN AWAY!
 
-        self.rotation = select(2, d:to_polar())-math.pi*3/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     end
+end
+
+function enemy:dir()
+    return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))
+end
+
+function enemy:pushback(v)
+    -- TODO
 end
 
 return enemy

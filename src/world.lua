@@ -89,4 +89,21 @@ end
 function world:mousemoved(mx, my, dx, dy)
 end
 
+function world:nearest(pos, incl_player)
+    local near
+
+    for k, e in pairs(self.entities) do
+        if (incl_player and k == player)
+            or k ~= player then
+
+            local d = (e.position-pos):len2()
+            if not near or d < near.d then
+                near = {e = e, d = d}
+            end
+        end
+    end
+
+    return near.e, math.sqrt(near.d)
+end
+
 return world

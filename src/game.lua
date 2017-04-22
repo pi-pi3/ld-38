@@ -108,12 +108,20 @@ function game.mousepressed(mx, my, button)
     local p = gfx.unproject(mx, my, math.rad(fov), near, far,
                             gfx.matrix())
     game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+
+    local near, d = game.world:nearest(p)
+    if near.t == 'enemy' and d < 2.5 then
+        game.world.entities.player:attack(near)
+    elseif d > 2.5 then
+        game.world.entities.player:attack(nil)
+    end
 end
 
 function game.mousemoved(mx, my, dx, dy)
     game.world:mousemoved(mx, my, dx, dy)
 
     if love.mouse.isDown(1) and game.world.entities.player.dest then
+        -- TODO: rotate player
         local p = gfx.unproject(mx, my, math.rad(fov), near, far,
                                 gfx.matrix())
         game.world.entities.player:moveto(cpml.vec2(p.x, p.y))

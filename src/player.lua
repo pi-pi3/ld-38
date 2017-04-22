@@ -25,6 +25,7 @@
 local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
+local sword = require('sword')
 
 local player = {}
 local mt = {__index = player}
@@ -38,16 +39,25 @@ function player.new(x, y, z)
     local self = {}
     setmetatable(self, mt)
 
+    self.t = 'player'
+
     self.velocity = cpml.vec2(0, 0)
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
+    self.scale = cpml.vec3(1, 1, 1)
 
-    self.health = 0
+    self.health = 42 -- The answer to life, the universe and everything.
+    self.strength = 5
+    self.power = 5
+    self.agility = 5
+    self.defense = 5
 
     self.timer = 0
     self.float = 0
+    self.attack_timer = 0
 
-    self.scale = cpml.vec3(1, 1, 1)
+    self.attacking = false
+
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
 
@@ -79,18 +89,46 @@ function player:draw()
     gfx.draw(self.model)
 
     gfx.pop()
+
+    if self.sword and self.sword:alive() then
+        self.sword:draw()
+    end
 end
 
 function player:update(dt)
     self.timer = self.timer + dt
+    self.attack_timer = self.attack_timer + dt
     self.float = 0.5+math.sin(self.timer)*0.5
 
     -- Update velocity
     local vx, vy = self.velocity.x, self.velocity.y
 
+    if self.attacking and self.dest then
+        self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
+    end
+
+    if self.attacking then
+        if not self.sword and self.attack_timer > 3 then
+            self.sword = sword.new(self)
+            self.attack_timer = 0
+        end
+    end
+
+    if self.sword then
+        if self.sword:alive() then
+            self.sword:update(dt)
+        else
+            self.sword = nil
+        end
+    end
+
     if self.dest then
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
-        if dir:len2() < 1 then
+
+        local min_dist = 1
+        if self.attacking then min_dist = 6.25 end
+
+        if dir:len2() < min_dist then
             self.dest = nil
         end
 
@@ -151,8 +189,17 @@ function player:moveto(x, y)
     self.dest = pos
 end
 
+function player:attack(enemy)
+    self.attacking = enemy
+end
+
+
 function player:keypressed(key)
     self.dest = nil
+end
+
+function player:dir()
+    return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))
 end
 
 return player
