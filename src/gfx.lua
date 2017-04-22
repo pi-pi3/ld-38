@@ -67,11 +67,30 @@ function gfx.transform(pos, rot, scale)
 
     local m = gfx.matrix()
 
-    -- the negatives are a hacky way of solving the matrix issue
     -- only z and x
+    cpml.mat4.translate(m, m, pos)
     cpml.mat4.rotate(m, m, rot.x, cpml.vec3(1, 0, 0))
     cpml.mat4.rotate(m, m, rot.z, cpml.vec3(0, 0, 1))
-    cpml.mat4.translate(m, m, pos)
+
+    shader:send('u_model', m:to_vec4s())
+end
+
+function gfx.camera(pos, rot, scale, origin)
+    pos = pos or cpml.vec3(0, 0, 0)
+    rot = rot or cpml.vec3(0, 0, 0)
+    scale = scale or cpml.vec3(1, 1, 1)
+    origin = origin or cpml.vec3(0, 0, 0)
+
+    origin = pos - origin
+
+    local m = gfx.matrix()
+
+    -- only z and x
+    cpml.mat4.rotate(m, m, -rot.x, cpml.vec3(1, 0, 0))
+    cpml.mat4.translate(m, m, -origin)
+    cpml.mat4.rotate(m, m, -rot.z, cpml.vec3(0, 0, 1))
+    cpml.mat4.translate(m, m, origin)
+    cpml.mat4.translate(m, m, -pos)
 
     shader:send('u_model', m:to_vec4s())
 end

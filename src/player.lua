@@ -32,6 +32,7 @@ local mt = {__index = player}
 local acc = 15
 local decc = 60
 local max_vel = 250
+local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
 
 function player.new(x, y, z)
     local self = {}
@@ -77,14 +78,31 @@ function player:update(dt)
 
     self.velocity.x, self.velocity.y = vx, vy
 
+    local c, s = math.cos(self.rotation), -math.sin(self.rotation)
+    local vx = self.velocity.x*dt
+    local vy = self.velocity.y*dt
+
     -- Update position
     self.position.x, self.position.y = 
-            self.position.x + self.velocity.x*dt,
-            self.position.y + self.velocity.y*dt
-end
+            self.position.x + vx*c + vy*s,
+            self.position.y + vy*c + vx*s
 
-function player:mousemoved(mx, my, dx, dy)
-    -- TODO: project and aim
+    -- Camera position
+    game.state.camera.pos.x, game.state.camera.pos.y = 
+            game.state.camera.pos.x + vx*c + vy*s,
+            game.state.camera.pos.y + vy*c + vx*s
+
+    -- A cheaty way to get mouse aiming
+    local w, h = love.graphics.getDimensions()
+    local mx, my = love.mouse.getPosition()
+    local p = cpml.vec3(mx-w/2, my-h/2+16, 0.0)
+    p = p:normalize()
+    if p.y <= 0 then
+        self.rotation = math.asin(p.x)
+    else
+        self.rotation = -math.asin(p.x)+math.pi
+    end
+    self.rotation = self.rotation + game.state.camera.rot.z
 end
 
 return player

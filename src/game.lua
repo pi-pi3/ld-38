@@ -27,6 +27,7 @@ local cpml = require('cpml')
 local world = require('world')
 
 local game = {}
+local camera_speed = 5
 
 function game.load()
     l3d.set_culling(false)
@@ -52,11 +53,18 @@ end
 
 function game.update(dt)
     game.world:update(dt)
+
+    if love.keyboard.isDown('q') then
+        game.camera.rot.z = game.camera.rot.z - dt*camera_speed
+    elseif love.keyboard.isDown('e') then
+        game.camera.rot.z = game.camera.rot.z + dt*camera_speed
+    end
 end
 
 function game.draw()
     gfx.identity()
-    gfx.transform(-game.camera.pos, -game.camera.rot)
+    gfx.camera(game.camera.pos, game.camera.rot, nil,
+               game.world.entities.player.position)
 
     game.shader:send('u_proj', game.camera.proj:to_vec4s())
 
@@ -75,9 +83,6 @@ end
 
 function game.mousemoved(mx, my, dx, dy)
     game.world:mousemoved(mx, my, dx, dy)
-
-    game.camera.rot.z = game.camera.rot.z + dx*0.01
-    game.camera.rot.x = game.camera.rot.x + dy*0.01
 end
 
 return game

@@ -279,4 +279,42 @@ function util.map_key(t, fn)
     return new
 end
 
+function util.vec2_len(a)
+    return math.sqrt(a.x*a.x+a.y*a.y)
+end
+
+function util.vec3_len(a)
+    return math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z)
+end
+
+function util.vec2_dot(a, b)
+    return a.x*b.x + a.y*b.y
+end
+
+function util.vec3_dot(a, b)
+    return a.x*b.x + a.y*b.y + a.z*b.z
+end
+
+-- project an arbitrary 2d point `a` 
+--   onto an axis `i` 
+--   in relation to point `p`
+function util.proj2(a, p, i)
+    local v = {x = a.x-p.x, a.y-p.y}
+    local r = util.vec2_len(v) * util.vec2_dot(v, i)
+    return {x = p.x + r*i.x, p.y + r*i.y}
+end
+
+-- project an arbitrary 3d point `a` 
+--   onto a plane x = r*`i` + s*`j`
+--   in relation to point `p`
+function util.proj3(a, p, i, j)
+    local v = {x = a.x-p.x, y = a.y-p.y, z = a.z-p.z}
+    local v_len = util.vec3_len(v)
+    local r = v_len * util.vec3_dot(v, i)
+    local s = v_len * util.vec3_dot(v, j)
+    return {x = p.x + r*i.x + s*j.x,
+            y = p.y + r*i.y + s*j.y,
+            z = p.z + r*i.z + s*j.z}
+end
+
 return util

@@ -79,7 +79,6 @@ function world:keypressed(key)
 end
 
 function world:mousemoved(mx, my, dx, dy)
-    self.entities.player:mousemoved(mx, my, dx, dy)
 end
 
 return world
