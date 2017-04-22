@@ -37,9 +37,11 @@ function block.new(block_type)
 
     if block_type == 1 then
         self.model = iqm.load('assets/models/block.iqm')
+        local tex = love.graphics.newImage('assets/textures/block.tga',
+                                           {mipmaps = true})
+        tex:setFilter('nearest', 'linear')
         self.model.textures = {
-            Materialblock = love.graphics.newImage('assets/textures/block.tga',
-                                                   {mipmaps = true})
+            Materialblock = tex
         }
     end
 
