@@ -41,6 +41,10 @@ function player.new(x, y, z)
     self.velocity = cpml.vec2(0, 0)
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
+
+    self.timer = 0
+    self.float = 0
+
     self.scale = cpml.vec3(1, 1, 1)
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
@@ -67,13 +71,18 @@ end
 function player:draw()
     gfx.push()
 
-    gfx.transform(self.position, cpml.vec3(0, 0, self.rotation), self.scale)
+    gfx.transform(self.position+cpml.vec3(0, 0, self.float),
+                  cpml.vec3(0, 0, self.rotation),
+                  self.scale)
     gfx.draw(self.model)
 
     gfx.pop()
 end
 
 function player:update(dt)
+    self.timer = self.timer + dt
+    self.float = 0.5+math.sin(self.timer)*0.5
+
     -- Update velocity
     local vx, vy = self.velocity.x, self.velocity.y
 
@@ -95,18 +104,18 @@ function player:update(dt)
 
     self.velocity.x, self.velocity.y = vx, vy
 
-    local c, s = math.cos(self.rotation), -math.sin(self.rotation)
+    local c, s = math.cos(self.rotation), math.sin(self.rotation)
     local vx = self.velocity.x*dt
     local vy = self.velocity.y*dt
 
     -- Update position
     self.position.x, self.position.y = 
-            self.position.x + vx*c + vy*s,
+            self.position.x + vx*c - vy*s,
             self.position.y + vy*c + vx*s
 
     -- Camera position
     game.state.camera.pos.x, game.state.camera.pos.y = 
-            game.state.camera.pos.x + vx*c + vy*s,
+            game.state.camera.pos.x + vx*c - vy*s,
             game.state.camera.pos.y + vy*c + vx*s
 
     -- A cheaty way to get mouse aiming
