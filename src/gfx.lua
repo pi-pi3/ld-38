@@ -71,6 +71,7 @@ function gfx.transform(pos, rot, scale)
     cpml.mat4.translate(m, m, pos)
     cpml.mat4.rotate(m, m, rot.x, cpml.vec3(1, 0, 0))
     cpml.mat4.rotate(m, m, rot.z, cpml.vec3(0, 0, 1))
+    cpml.mat4.scale(m, m, scale)
 
     shader:send('u_model', m:to_vec4s())
 end
