@@ -29,8 +29,6 @@ local cpml = require('cpml')
 local enemy = {}
 local mt = {__index = enemy}
 
-local acc = 15
-local decc = 60
 local max_vel = 2.5
 
 --[[ AI (simplified)
