@@ -18,7 +18,8 @@ vec4 position(mat4 _, vec4 vertex) {
 #ifdef PIXEL
 
 vec4 effect(vec4 _col, Image s_color, vec2 _uv, vec2 _sc) {
-    return vec4(_col.rgb, 1.0);
+    vec4 col = texture2D(s_color, _uv);
+    return vec4(col.rgb, 1.0);
 }
 
 #endif

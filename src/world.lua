@@ -64,11 +64,11 @@ function world:draw()
         end
     end
 
-    --for _, e in pairs(self.entities) do
-    --    if e.draw then
-    --        e:draw()
-    --    end
-    --end
+    for _, e in pairs(self.entities) do
+        if e.draw then
+            e:draw()
+        end
+    end
 end
 
 return world

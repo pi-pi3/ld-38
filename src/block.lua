@@ -37,6 +37,10 @@ function block.new(block_type)
 
     if block_type == 1 then
         self.model = iqm.load('assets/models/block.iqm')
+        self.model.textures = {
+            Materialblock = love.graphics.newImage('assets/textures/block.tga',
+                                                   {mipmaps = true})
+        }
     end
 
     return self

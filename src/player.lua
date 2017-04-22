@@ -35,7 +35,8 @@ function player.new(x, y, z)
 
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
-    --self.model = iqm.load('assets/models/player.iqm')
+    self.model = iqm.load('assets/models/player.iqm')
+    self.model.textures = {}
 
     return self
 end
@@ -43,7 +44,7 @@ end
 function player:draw()
     gfx.push()
 
-    gfx.transform(pos)
+    gfx.transform(self.position, cpml.vec3(0, 0, self.rotation))
     gfx.draw(self.model)
 
     gfx.pop()

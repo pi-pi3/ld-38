@@ -45,9 +45,9 @@ function game.load()
 
     local w, h = 8, 8
     game.world = world.gen(w, h)
-    game.camera = {pos = cpml.vec3(0, -6, -8),
-                   rot = cpml.vec3(-2.6, 0, math.pi),
-                   proj = cpml.mat4.from_perspective(90, width/height, 0.1, 100)}
+    game.camera = {pos = cpml.vec3(0, 6, 10),
+                   rot = cpml.vec3(2.6, 0, 0),
+                   proj = gfx.projection(90, width/height, 0.1, 100)}
 end
 
 function game.update()
@@ -64,15 +64,15 @@ end
 
 function game.keypressed(key, scancode, isrepeat)
     if scancode == 'r' then
-        game.camera.pos.z = game.camera.pos.z - 0.1
-    elseif scancode == 'f' then
         game.camera.pos.z = game.camera.pos.z + 0.1
+    elseif scancode == 'f' then
+        game.camera.pos.z = game.camera.pos.z - 0.1
     end
 end
 
 function game.mousemoved(mx, my, dx, dy)
-    game.camera.rot.z = game.camera.rot.z + dx*0.01
-    game.camera.rot.x = game.camera.rot.x - dy*0.01
+    game.camera.rot.z = game.camera.rot.z - dx*0.01
+    game.camera.rot.x = game.camera.rot.x + dy*0.01
 end
 
 return game

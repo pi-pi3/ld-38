@@ -50,6 +50,16 @@ function gfx.identity()
     cpml.mat4.identity(gfx.matrix())
 end
 
+function gfx.projection(fov, aspect, n, f)
+    local t   = math.tan(math.rad(fov) / 2)
+    local out = cpml.mat4.new({1/(t*aspect), 0.0, 0.0,          0.0,
+                               0.0,          1/t, 0.0,          0.0,
+                               0.0,          0.0, (f+n)/(f-n), 1,
+                               0.0,          0.0, -(2*f*n)/(f-n), 0.0})
+
+    return out
+end
+
 function gfx.transform(pos, rot, scale)
     pos = pos or cpml.vec3(0, 0, 0)
     rot = rot or cpml.vec3(0, 0, 0)
@@ -57,6 +67,7 @@ function gfx.transform(pos, rot, scale)
 
     local m = gfx.matrix()
 
+    -- the negatives are a hacky way of solving the matrix issue
     -- only z and x
     cpml.mat4.rotate(m, m, rot.x, cpml.vec3(1, 0, 0))
     cpml.mat4.rotate(m, m, rot.z, cpml.vec3(0, 0, 1))
@@ -67,6 +78,8 @@ end
 
 function gfx.draw(model)
     for _, buffer in ipairs(model) do
+        local texture = model.textures[buffer.material]
+        model.mesh:setTexture(texture)
         model.mesh:setDrawRange(buffer.first, buffer.last)
         love.graphics.draw(model.mesh)
     end
