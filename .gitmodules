@@ -1,0 +1,9 @@
+[submodule "love3d"]
+	path = src/love3d
+	url = https://github.com/excessive/love3d
+[submodule "src/cpml"]
+	path = src/cpml
+	url = https://github.com/excessive/cpml
+[submodule "src/iqm"]
+	path = src/iqm
+	url = https://github.com/excessive/iqm
