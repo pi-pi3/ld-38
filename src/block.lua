@@ -50,14 +50,12 @@ function block:draw(x, y, z)
         pos = cpml.vec3(x, y, z or 0)
     end
 
-    love.graphics.push('transform')
+    gfx.push()
 
-    cpml.mat4.translate(transform_matrix, transform_matrix, pos)
-    shader:send('u_model', transform_matrix:to_vec4s())
+    gfx.transform(pos)
+    gfx.draw(self.model)
 
-    love.graphics.draw(self.model.mesh)
-
-    love.graphics.pop()
+    gfx.pop()
 end
 
 return block

@@ -25,6 +25,8 @@
 l3d = require('love3d')
 l3d.import(true)
 
+gfx = require('gfx')
+
 local util = require('util')
 local lgui = require('lgui')
 declare = util.declare -- global alias for declare, should work in every file

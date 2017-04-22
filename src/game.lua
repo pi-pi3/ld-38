@@ -34,35 +34,45 @@ function game.load()
     l3d.set_depth_test('less')
     love.graphics.setBlendMode('replace')
 
-    -- these probably shouldn't be global
-    declare('transform_matrix', cpml.mat4.identity())
+    -- this probably shouldn't be global
     declare('shader')
 
     game.shader = love.graphics.newShader('assets/shaders/shader.glsl')
     shader = game.shader
+    love.graphics.setShader(game.shader)
 
     local width, height = love.graphics.getDimensions()
 
     local w, h = 8, 8
     game.world = world.gen(w, h)
-    game.camera = {pos = cpml.vec3(0, 0, 0),
-                   rot = cpml.vec3(0, 0, 0), -- only z and x rotation is used
+    game.camera = {pos = cpml.vec3(0, 0, -8),
+                   rot = cpml.vec3(-math.pi*.8, 0, 0), -- only z and x rotation is used
                    proj = cpml.mat4.from_perspective(90, width/height, 0.1, 100)}
 end
 
-function game.draw()
-    cpml.mat4.identity(transform_matrix)
+function game.update()
+end
 
-    cpml.mat4.translate(transform_matrix, transform_matrix, -game.camera.pos)
-    -- only z and x
-    cpml.mat4.rotate(transform_matrix, transform_matrix,
-                     -game.camera.rot.z, cpml.vec3(0, 0, 1))
-    cpml.mat4.rotate(transform_matrix, transform_matrix,
-                     -game.camera.rot.x, cpml.vec3(1, 0, 0))
+function game.draw()
+    gfx.identity()
+    gfx.transform(-game.camera.pos, -game.camera.rot)
 
     game.shader:send('u_proj', game.camera.proj:to_vec4s())
 
     game.world:draw()
+end
+
+function game.keypressed(key, scancode, isrepeat)
+    if scancode == 'r' then
+        game.camera.pos.z = game.camera.pos.z - 0.1
+    elseif scancode == 'f' then
+        game.camera.pos.z = game.camera.pos.z + 0.1
+    end
+end
+
+function game.mousemoved(mx, my, dx, dy)
+    game.camera.rot.z = game.camera.rot.z + dx*0.01
+    game.camera.rot.x = game.camera.rot.x - dy*0.01
 end
 
 return game

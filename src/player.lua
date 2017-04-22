@@ -41,17 +41,12 @@ function player.new(x, y, z)
 end
 
 function player:draw()
-    love.graphics.push('transform')
+    gfx.push()
 
-    cpml.mat4.translate(transform_matrix, transform_matrix, self.position)
-    -- only z
-    cpml.mat4.rotate(transform_matrix, transform_matrix,
-                      self.rotation, cpml.vec3(0, 0, 1))
-    shader:send('u_model', transform_matrix:to_vec4s())
+    gfx.transform(pos)
+    gfx.draw(self.model)
 
-    love.graphics.draw(self.model.mesh)
-
-    love.graphics.pop()
+    gfx.pop()
 end
 
 return player
