@@ -55,11 +55,11 @@ end
 
 function world:draw()
     for i = 1, self.height do
-        local y = i-4
+        local y = i*2-9
         for j = 1, self.width do
-            local x = j-4
+            local x = j*2-9
             local t = self.world[i][j]
-            
+
             self.blocks[t]:draw(x, y)
         end
     end

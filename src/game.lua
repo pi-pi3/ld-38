@@ -45,8 +45,8 @@ function game.load()
 
     local w, h = 8, 8
     game.world = world.gen(w, h)
-    game.camera = {pos = cpml.vec3(0, 0, -8),
-                   rot = cpml.vec3(-math.pi*.8, 0, 0), -- only z and x rotation is used
+    game.camera = {pos = cpml.vec3(0, -6, -8),
+                   rot = cpml.vec3(-2.6, 0, math.pi),
                    proj = cpml.mat4.from_perspective(90, width/height, 0.1, 100)}
 end
 

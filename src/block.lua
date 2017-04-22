@@ -46,8 +46,8 @@ function block:draw(x, y, z)
     local pos
     if x and not y and not z then
         pos = x
-    elseif x and y then
-        pos = cpml.vec3(x, y, z or 0)
+    else
+        pos = cpml.vec3(x or 0, y or 0, z or 0)
     end
 
     gfx.push()

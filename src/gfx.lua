@@ -23,6 +23,7 @@
 ]]
 
 local cpml = require('cpml')
+local util = require('util')
 
 local gfx = {}
 gfx.matrix_stack = {}
@@ -34,12 +35,15 @@ function gfx.matrix()
 end
 
 function gfx.push()
-    table.insert(gfx.matrix_stack, cpml.mat4.clone(gfx.matrix()))
+    -- cpml.mat4.clone doesn't work for some reason
+    local m = util.copy(gfx.matrix())
+    table.insert(gfx.matrix_stack, m)
 end
 
 function gfx.pop()
     local m = gfx.matrix()
     table.remove(gfx.matrix_stack, #gfx.matrix_stack)
+    return m
 end
 
 function gfx.identity()
