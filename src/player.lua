@@ -41,7 +41,7 @@ function player.new(x, y, z)
     self.velocity = cpml.vec2(0, 0)
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
-    self.scale = cpml.vec3(0.5, 0.5, 0.5)
+    self.scale = cpml.vec3(1, 1, 1)
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
 
