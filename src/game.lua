@@ -25,20 +25,21 @@
 local util = require('util')
 local cpml = require('cpml')
 local world = require('world')
-local shader = require('assets/shaders/shader.glsl')
 
 local game = {}
 
 function game.load()
-    love.graphics.setCulling(false) -- for now
-    love.graphics.setDepthWrite(true)
-    love.graphics.setDepthTest('less')
+    l3d.set_culling(false)
+    l3d.set_depth_write(true)
+    l3d.set_depth_test('less')
     love.graphics.setBlendMode('replace')
 
-    -- this probably shouldn't be global
+    -- these probably shouldn't be global
     declare('transform_matrix', cpml.mat4.identity())
+    declare('shader')
 
     game.shader = love.graphics.newShader('assets/shaders/shader.glsl')
+    shader = game.shader
 
     local width, height = love.graphics.getDimensions()
 
@@ -50,18 +51,18 @@ function game.load()
 end
 
 function game.draw()
-    love.graphics.clearDepth()
+    cpml.mat4.identity(transform_matrix)
 
-    cpml.mat4f.identity(transform_matrix)
-
-    cpml.mat4f.translate(transform_matrix, transform_matrix, -game.camera.pos)
+    cpml.mat4.translate(transform_matrix, transform_matrix, -game.camera.pos)
     -- only z and x
-    cpml.mat4f.rotate(transform_matrix, transform_matrix,
-                      -game.rot.z, cpml.vec3(0, 0, 1))
-    cpml.mat4f.rotate(transform_matrix, transform_matrix,
-                      -game.rot.x, cpml.vec3(1, 0, 0))
+    cpml.mat4.rotate(transform_matrix, transform_matrix,
+                     -game.camera.rot.z, cpml.vec3(0, 0, 1))
+    cpml.mat4.rotate(transform_matrix, transform_matrix,
+                     -game.camera.rot.x, cpml.vec3(1, 0, 0))
 
-    game.shader:send('u_proj', game.camera.proj.to_vec4s())
+    game.shader:send('u_proj', game.camera.proj:to_vec4s())
 
     game.world:draw()
 end
+
+return game

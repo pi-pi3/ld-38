@@ -10,7 +10,7 @@ all: love linux windows mac
 love:
 	@echo "Creating love file..."
 	rm -f release/$(GAME).love
-	cd src; zip -9 -r ../release/$(GAME).love *.lua
+	cd src; zip -9 -r ../release/$(GAME).love *.lua cpml love3d iqm
 	zip -9 -r release/$(GAME).love assets LICENSE README.md
 	@echo "Done."
 

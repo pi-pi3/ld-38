@@ -23,7 +23,7 @@ const float gamma = 2.2;
 
 vec4 effect(vec4 _col, Image s_color, vec2 _uv, vec2 _sc) {
     // temporary
-    vec4 u_light = vec4(0.0, 0.0, -1.0, 1.0)
+    vec4 u_light = vec4(0.0, 0.0, -1.0, 1.0);
 
     vec4 color  = gammaToLinear(_col);
     vec3 normal = normalize(f_normal);

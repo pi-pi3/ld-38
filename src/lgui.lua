@@ -563,6 +563,10 @@ function lgui.interaction(e, mx, my, callback)
 end
 
 function lgui.mousepressed(elements, mx, my)
+    if not elements then
+        return
+    end
+
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.x and e.y and e.width and e.height
@@ -622,6 +626,10 @@ function list_getsel(e, my)
 end
 
 function lgui.mousereleased(elements, mx, my)
+    if not elements then
+        return
+    end
+
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'container' then
@@ -668,6 +676,10 @@ function lgui.mousereleased(elements, mx, my)
 end
 
 function lgui.mousemoved(elements, mx, my, dx, dy)
+    if not elements then
+        return
+    end
+
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'container' and e.down then
@@ -693,6 +705,10 @@ function lgui.mousemoved(elements, mx, my, dx, dy)
 end
 
 function lgui.wheelmoved(elements, dx, dy, x, y)
+    if not elements then
+        return
+    end
+
     local mx, my = love.mouse.getPosition()
     if x then mx = mx + x end
     if y then my = my + y end
@@ -730,6 +746,10 @@ function lgui.wheelmoved(elements, dx, dy, x, y)
 end
 
 function lgui.textinput(elements, c)
+    if not elements then
+        return
+    end
+
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'textfield' and e.focus then
@@ -742,6 +762,10 @@ function lgui.textinput(elements, c)
 end
 
 function lgui.keypressed(elements, key, scancode, isrepeat)
+    if not elements then
+        return
+    end
+
     for _, e in pairs(elements) do
         if not e.pause and e.active then
             if e.t == 'textfield' and e.focus then

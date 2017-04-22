@@ -24,16 +24,18 @@
 
 local util = require('util')
 local iqm = require('iqm')
-local cpml = require('iqm')
+local cpml = require('cpml')
 
 local player = {}
 local mt = {__index = player}
 
-function player.new(x, y)
+function player.new(x, y, z)
     local self = {}
-    self.position = cpml.vec3(x or 0, y or 0, z)
+    setmetatable(self, mt)
+
+    self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
-    self.model = iqm.load('assets/models/player.iqm')
+    --self.model = iqm.load('assets/models/player.iqm')
 
     return self
 end
@@ -41,13 +43,15 @@ end
 function player:draw()
     love.graphics.push('transform')
 
-    cpml.mat4f.translate(transform_matrix, transform_matrix, self.position)
+    cpml.mat4.translate(transform_matrix, transform_matrix, self.position)
     -- only z
-    cpml.mat4f.rotate(transform_matrix, transform_matrix,
+    cpml.mat4.rotate(transform_matrix, transform_matrix,
                       self.rotation, cpml.vec3(0, 0, 1))
-    game.shader:send('u_model', transform_matrix)
+    shader:send('u_model', transform_matrix:to_vec4s())
 
     love.graphics.draw(self.model.mesh)
 
     love.graphics.pop()
 end
+
+return player

@@ -31,11 +31,13 @@ local mt = {__index = world}
 
 function world.gen(w, h)
     local self = {}
+    setmetatable(self, mt)
+
     self.entities = {}
     self.entities.player = player.new()
 
     self.blocks = {}
-    blocks[1] = block.new(1)
+    self.blocks[1] = block.new(1)
 
     self.world = {} -- rename this
     self.width = w
@@ -58,13 +60,15 @@ function world:draw()
             local x = j-4
             local t = self.world[i][j]
             
-            blocks[t]:draw(x, y)
+            self.blocks[t]:draw(x, y)
         end
     end
 
-    for _, e in pairs(self.entities) do
-        if e.draw then
-            e:draw()
-        end
-    end
+    --for _, e in pairs(self.entities) do
+    --    if e.draw then
+    --        e:draw()
+    --    end
+    --end
 end
+
+return world

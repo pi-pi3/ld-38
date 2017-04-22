@@ -24,7 +24,7 @@
 
 local util = require('util')
 local iqm = require('iqm')
-local cpml = require('iqm')
+local cpml = require('cpml')
 
 local block = {}
 local mt = {__index = block}
@@ -33,6 +33,7 @@ function block.new(block_type)
     block_type = block_type or 1
 
     local self = {}
+    setmetatable(self, mt)
 
     if block_type == 1 then
         self.model = iqm.load('assets/models/block.iqm')
@@ -51,13 +52,12 @@ function block:draw(x, y, z)
 
     love.graphics.push('transform')
 
-    cpml.mat4f.translate(transform_matrix, transform_matrix, pos)
-    -- only z
-    cpml.mat4f.rotate(transform_matrix, transform_matrix,
-                      -self.rotation, cpml.vec3(0, 0, 1))
-    game.shader:send('u_model', transform_matrix)
+    cpml.mat4.translate(transform_matrix, transform_matrix, pos)
+    shader:send('u_model', transform_matrix:to_vec4s())
 
     love.graphics.draw(self.model.mesh)
 
     love.graphics.pop()
 end
+
+return block

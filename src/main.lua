@@ -22,6 +22,9 @@
     distribution.
 ]]
 
+l3d = require('love3d')
+l3d.import(true)
+
 local util = require('util')
 local lgui = require('lgui')
 declare = util.declare -- global alias for declare, should work in every file
@@ -55,10 +58,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.clear(0, 0, 0)
+    l3d.clear(true, true)
 
     if game.state.draw then
-        game.state.draw(dt)
+        game.state.draw()
     end
 
     lgui.drawall(game.state.elements)
