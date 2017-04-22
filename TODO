@@ -1,1 +1,5 @@
+Todo: 
 [x] Add cpml, iqm, l3d submodules
+
+Bugs:
+[ ] Player speeds up too much when going in circles
