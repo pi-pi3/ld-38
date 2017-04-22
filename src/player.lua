@@ -42,6 +42,8 @@ function player.new(x, y, z)
     self.position = cpml.vec3(x or 0, y or 0, z or 1)
     self.rotation = 0 -- z only
 
+    self.health = 0
+
     self.timer = 0
     self.float = 0
 
