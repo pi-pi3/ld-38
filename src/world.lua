@@ -34,7 +34,7 @@ function world.gen(w, h)
     setmetatable(self, mt)
 
     self.entities = {}
-    self.entities.player = player.new()
+    self.entities.player = player.new(0, 0, 2)
 
     self.blocks = {}
     self.blocks[1] = block.new(1)
@@ -53,6 +53,10 @@ function world.gen(w, h)
     return self
 end
 
+function world:update(dt)
+    self.entities.player:update(dt)
+end
+
 function world:draw()
     for i = 1, self.height do
         local y = i*2-9
@@ -69,6 +73,13 @@ function world:draw()
             e:draw()
         end
     end
+end
+
+function world:keypressed(key)
+end
+
+function world:mousemoved(mx, my, dx, dy)
+    self.entities.player:mousemoved(mx, my, dx, dy)
 end
 
 return world

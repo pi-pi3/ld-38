@@ -142,9 +142,19 @@ function util.copy(orig, recurse)
     return copy
 end
 
+function util.sign(a)
+    if a == 0 then return 0
+    elseif a > 0 then return 1
+    elseif a < 0 then return -1 end
+end
+
 -- clamp x into the range min-max
 -- min and max may be nil for unbounded range on either side
 function util.clamp(x, min, max)
+    if min > max then
+        min, max = max, min
+    end
+
     if min == nil then
         if max == nil then
             return x

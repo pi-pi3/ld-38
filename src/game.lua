@@ -50,7 +50,8 @@ function game.load()
                    proj = gfx.projection(90, width/height, 0.1, 100)}
 end
 
-function game.update()
+function game.update(dt)
+    game.world:update(dt)
 end
 
 function game.draw()
@@ -63,6 +64,8 @@ function game.draw()
 end
 
 function game.keypressed(key, scancode, isrepeat)
+    game.world:keypressed(scancode)
+
     if scancode == 'r' then
         game.camera.pos.z = game.camera.pos.z + 0.1
     elseif scancode == 'f' then
@@ -71,7 +74,9 @@ function game.keypressed(key, scancode, isrepeat)
 end
 
 function game.mousemoved(mx, my, dx, dy)
-    game.camera.rot.z = game.camera.rot.z - dx*0.01
+    game.world:mousemoved(mx, my, dx, dy)
+
+    game.camera.rot.z = game.camera.rot.z + dx*0.01
     game.camera.rot.x = game.camera.rot.x + dy*0.01
 end
 
