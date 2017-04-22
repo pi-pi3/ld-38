@@ -83,6 +83,7 @@ function world:draw()
 end
 
 function world:keypressed(key)
+    self.entities.player:keypressed(key)
 end
 
 function world:mousemoved(mx, my, dx, dy)

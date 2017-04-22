@@ -107,4 +107,32 @@ function gfx.draw(model)
     end
 end
 
+function gfx.unproject(mx, my, fov, near, far, view)
+    local w, h = love.graphics.getDimensions()
+    local aspect = w/h
+    local tan_fov = math.tan(fov*0.5)
+
+    local s = {x = tan_fov*(2*mx/w-1)*aspect,
+               y = 1-2*my/h}
+
+    local p1 = {s.x*near, s.y*near, near, 1.0}
+    local p2 = {s.x*far, s.y*far, far, 1.0}
+
+    local inv = cpml.mat4()
+    cpml.mat4.invert(inv, view)
+
+    cpml.mat4.mul_vec4(p1, inv, p1)
+    cpml.mat4.mul_vec4(p2, inv, p2)
+
+    p1 = cpml.vec3(p1)
+    p2 = cpml.vec3(p2)
+
+    local d = p2-p1
+
+    -- 2.0 = ground level
+    local w = (2.0-p1.z)/(d.z)
+
+    return p1+d*w
+end
+
 return gfx

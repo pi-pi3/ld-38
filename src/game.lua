@@ -29,6 +29,10 @@ local world = require('world')
 
 local game = {}
 local camera_speed = 5
+local fov = 90
+local near = 0.1
+local far = 100
+local theta = 2.6
 
 function game.load()
     l3d.set_culling(false)
@@ -48,8 +52,8 @@ function game.load()
     local w, h = 8, 8
     game.world = world.gen(w, h)
     game.camera = {pos = cpml.vec3(0, 6, 10),
-                   rot = cpml.vec3(2.6, 0, 0),
-                   proj = gfx.projection(90, width/height, 0.1, 100)}
+                   rot = cpml.vec3(theta, 0, 0),
+                   proj = gfx.projection(fov, width/height, near, far)}
 
     game.skybox = iqm.load('assets/models/skybox.iqm')
     local skybox = love.graphics.newImage('assets/textures/skybox.tga',
@@ -74,7 +78,7 @@ function game.draw()
     gfx.identity()
 
     l3d.set_depth_write(false)
-    -- skybox goes here
+
     gfx.push()
     gfx.camera(cpml.vec3(0, 0, 4), game.camera.rot, nil)
 
@@ -100,8 +104,20 @@ function game.keypressed(key, scancode, isrepeat)
     end
 end
 
+function game.mousepressed(mx, my, button)
+    local p = gfx.unproject(mx, my, math.rad(fov), near, far,
+                            gfx.matrix())
+    game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+end
+
 function game.mousemoved(mx, my, dx, dy)
     game.world:mousemoved(mx, my, dx, dy)
+
+    if love.mouse.isDown(1) and game.world.entities.player.dest then
+        local p = gfx.unproject(mx, my, math.rad(fov), near, far,
+                                gfx.matrix())
+        game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+    end
 end
 
 return game

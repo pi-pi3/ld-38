@@ -31,7 +31,7 @@ local mt = {__index = enemy}
 
 local acc = 15
 local decc = 60
-local max_vel = 100
+local max_vel = 2.5
 
 --[[ AI (simplified)
          found
@@ -92,8 +92,8 @@ function enemy:update(dt)
         self:flee(dt, player)
     end
 
-    local vx = self.velocity.x*dt
-    local vy = self.velocity.y*dt
+    local vx = self.velocity.x*dt*max_vel
+    local vy = self.velocity.y*dt*max_vel
 
     -- Update position
     self.position.x, self.position.y = 
@@ -133,13 +133,8 @@ function enemy:search(dt, player)
             self.searching.dst = player.position
         end
 
-        local v = d:normalize() -- XXX I think there's something there...
-        local rot
-        if v.y <= 0 then
-            rot = math.asin(v.x)
-        else
-            rot = -math.asin(v.x)+math.pi
-        end
+        local v = cpml.vec2(d.x, d.y) -- XXX I think there's something there...
+        local rot = select(2, v:to_polar())-math.pi*3/2
 
         rot = rot + self.searching.rot
 
@@ -164,18 +159,12 @@ function enemy:attack(dt, player)
     elseif distance > 6.25 then
         self.velocity = d*2 -- XXX GET HIM!
 
-        self.rotation = math.asin(d.x)
-        if d.x > 0 then
-            self.rotation = -self.rotation+math.pi
-        end
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     else
         -- attack
         self.velocity = cpml.vec2(0, 0)
 
-        self.rotation = math.asin(d.x)
-        if d.x > 0 then
-            self.rotation = -self.rotation+math.pi
-        end
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     end
 
     if self.health < 100.0 then
@@ -193,11 +182,7 @@ function enemy:flee(dt, player)
     else
         self.velocity = -d:normalize()*2 -- XXX RUN AWAY!
 
-        local d = self.velocity:normalize()
-        self.rotation = math.asin(d.x)
-        if d.x > 0 then
-            self.rotation = -self.rotation+math.pi
-        end
+        self.rotation = select(2, d:to_polar())-math.pi*3/2
     end
 end
 

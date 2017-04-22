@@ -29,9 +29,9 @@ local cpml = require('cpml')
 local player = {}
 local mt = {__index = player}
 
-local acc = 15
-local decc = 60
-local max_vel = 250
+local acc = 150
+local decc = 600
+local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
 
 function player.new(x, y, z)
@@ -88,20 +88,31 @@ function player:update(dt)
     -- Update velocity
     local vx, vy = self.velocity.x, self.velocity.y
 
-    if love.keyboard.isDown('w') then
-        vy = util.clamp(vy - acc*dt, -max_vel, max_vel)
-    elseif love.keyboard.isDown('s') then
-        vy = util.clamp(vy + acc*dt, -max_vel, max_vel)
-    else
-        vy = util.clamp(vy - decc*dt*util.sign(vy), 0, max_vel*util.sign(vy))
-    end
+    if self.dest then
+        local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
+        if dir:len2() < 1 then
+            self.dest = nil
+        end
 
-    if love.keyboard.isDown('a') then
-        vx = util.clamp(vx - acc*dt, -max_vel, max_vel)
-    elseif love.keyboard.isDown('d') then
-        vx = util.clamp(vx + acc*dt, -max_vel, max_vel)
-    else
-        vx = util.clamp(vx - decc*dt*util.sign(vx), 0, max_vel*util.sign(vx))
+        self.rotation = select(2, dir:to_polar())-math.pi*3/2
+        vx = 0
+        vy = util.clamp(vy - acc*dt, -max_vel, max_vel)
+    else 
+        if love.keyboard.isDown('w') then
+            vy = util.clamp(vy - acc*dt, -max_vel, max_vel)
+        elseif love.keyboard.isDown('s') then
+            vy = util.clamp(vy + acc*dt, -max_vel, max_vel)
+        else
+            vy = util.clamp(vy - decc*dt*util.sign(vy), 0, max_vel*util.sign(vy))
+        end
+
+        if love.keyboard.isDown('a') then
+            vx = util.clamp(vx - acc*dt, -max_vel, max_vel)
+        elseif love.keyboard.isDown('d') then
+            vx = util.clamp(vx + acc*dt, -max_vel, max_vel)
+        else
+            vx = util.clamp(vx - decc*dt*util.sign(vx), 0, max_vel*util.sign(vx))
+        end
     end
 
     self.velocity.x, self.velocity.y = vx, vy
@@ -123,14 +134,25 @@ function player:update(dt)
     -- A cheaty way to get mouse aiming
     local w, h = love.graphics.getDimensions()
     local mx, my = love.mouse.getPosition()
-    local p = cpml.vec3(mx-w/2, my-h/2+16, 0.0)
+    local p = cpml.vec2(mx-w/2, my-h/2+16)
     p = p:normalize()
-    if p.y <= 0 then
-        self.rotation = math.asin(p.x)
-    else
-        self.rotation = -math.asin(p.x)+math.pi
-    end
+    self.rotation = select(2, p:to_polar())-math.pi*3/2
     self.rotation = self.rotation + game.state.camera.rot.z
+end
+
+function player:moveto(x, y)
+    local pos
+    if x and not y then
+        pos = x
+    else
+        pos = cpml.vec2(x, y)
+    end
+
+    self.dest = pos
+end
+
+function player:keypressed(key)
+    self.dest = nil
 end
 
 return player
