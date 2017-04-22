@@ -45,6 +45,22 @@ function player.new(x, y, z)
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
 
+    self.model.textures.djinni_body =
+        love.graphics.newImage('assets/textures/djinni_body.tga', {mipmaps = true})
+    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+
+    self.model.textures.djinni_belt =
+        love.graphics.newImage('assets/textures/djinni_belt.tga', {mipmaps = true})
+    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+
+    self.model.textures.djinni_eye =
+        love.graphics.newImage('assets/textures/djinni_eye.tga', {mipmaps = true})
+    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+
+    self.model.textures.djinni_tail =
+        love.graphics.newImage('assets/textures/djinni_tail.tga', {mipmaps = true})
+    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+
     return self
 end
 
