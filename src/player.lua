@@ -49,7 +49,7 @@ function player.new(x, y, z)
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = -8
+    self.strength = 8
     self.power = 20
     self.agility = 5
     self.defense = 5
