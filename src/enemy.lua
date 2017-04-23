@@ -27,8 +27,10 @@ local iqm = require('iqm')
 local cpml = require('cpml')
 local anim9 = require('anim9')
 local sword = require('sword')
+local entity = require('entity')
 
 local enemy = {}
+setmetatable(enemy, {__index = entity})
 local mt = {__index = enemy}
 
 local max_vel = 2.5
@@ -48,15 +50,10 @@ local attack_delay = 2
 ]]
 
 function enemy.new(x, y, z)
-    local self = {}
+    local self = entity.new(x, y, z, 'skeleton.iqm', nil, {'walking', 'running'})
     setmetatable(self, mt)
 
     self.t = 'enemy'
-
-    self.velocity = cpml.vec2(0, 0)
-    self.position = cpml.vec3(x or 0, y or 0, z or 1)
-    self.rotation = 0 -- z only
-    self.scale = cpml.vec3(1, 1, 1)
 
     self.health = 12
     self.health_max = 12
@@ -69,20 +66,27 @@ function enemy.new(x, y, z)
     self.searching = {timer = 0,
                       rot = 0,
                       dst = {}}
-    self.attacking = false
-    self.attack_timer = attack_delay
-
-    self.scale = cpml.vec3(1, 1, 1)
-    self.model = iqm.load('assets/models/skeleton.iqm')
-    self.model.textures = {}
-    self.model.anims = iqm.load_anims('assets/models/skeleton.iqm')
-    self.model.anim = anim9(self.model.anims)
-    assert(self.model.anim)
 
     self.anim = 'none'
     self:stand()
 
     return self
+end
+
+function enemy:update(dt)
+    local player = game.state.world.entities.player
+
+    if self.state == 'idle' then 
+        self:idle(dt, player)
+    elseif self.state == 'searching' then 
+        self:search(dt, player)
+    elseif self.state == 'attacking' then 
+        self:attack(dt, player)
+    elseif self.state == 'fleeing' then 
+        self:flee(dt, player)
+    end
+
+    entity.update(self, dt)
 end
 
 function enemy:walk()
@@ -114,60 +118,6 @@ end
 function enemy:stand()
     self:walk()
     self.walking.playing = false
-end
-
-function enemy:draw()
-    gfx.set_shader(shader_anim)
-
-    gfx.push()
-
-    gfx.transform(self.position,
-                  cpml.vec3(0, 0, self.rotation),
-                  self.scale)
-    gfx.draw(self.model)
-
-    gfx.pop()
-
-    if self.sword and self.sword:alive() then
-        self.sword:draw()
-    end
-end
-
-function enemy:update(dt)
-    self.attack_timer = self.attack_timer + dt
-    self.model.anim:update(dt)
-
-    if self.health <= 0 then
-        game.state.world:remove(self)
-    end
-
-    if self.sword then
-        if self.sword:alive() then
-            self.sword:update(dt)
-        else
-            self.sword = nil
-        end
-    end
-
-    local player = game.state.world.entities.player
-
-    if self.state == 'idle' then 
-        self:idle(dt, player)
-    elseif self.state == 'searching' then 
-        self:search(dt, player)
-    elseif self.state == 'attacking' then 
-        self:attack(dt, player)
-    elseif self.state == 'fleeing' then 
-        self:flee(dt, player)
-    end
-
-    local vx = self.velocity.x*dt*max_vel
-    local vy = self.velocity.y*dt*max_vel
-
-    -- Update position
-    self.position.x, self.position.y = 
-            self.position.x + vx,
-            self.position.y + vy
 end
 
 function enemy:idle(dt, player)
@@ -266,14 +216,6 @@ function enemy:flee(dt, player)
     end
 
     self:run()
-end
-
-function enemy:dir()
-    return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))
-end
-
-function enemy:pushback(v)
-    -- TODO
 end
 
 return enemy

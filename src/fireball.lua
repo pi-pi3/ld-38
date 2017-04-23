@@ -25,15 +25,17 @@
 local util = require('util')
 local cpml = require('cpml')
 local iqm = require('iqm')
+local entity = require('entity')
 
 local fireball = {}
+setmetatable(fireball, {__index = entity})
 local mt = {__index = fireball}
 
 local time = 8.0
 local max_vel = 10.0 -- Gotta go fast
 
 function fireball.new(owner, mult)
-    local self = {}
+    local self = entity.new(0, 0, 0, 'fireball.iqm', {'fireball.tga'}, nil)
     setmetatable(self, mt)
 
     self.t = 'fireball'
@@ -41,7 +43,7 @@ function fireball.new(owner, mult)
 
     local rot = owner.rotation
     self.position = util.copy(owner.position)
-    self.velocity = cpml.vec3(math.sin(rot)*max_vel, -math.cos(rot)*max_vel, 0.0)
+    self.velocity = cpml.vec2(math.sin(rot)*max_vel, -math.cos(rot)*max_vel)
     self.rotation = rot
 
     -- Big things hit hard, right?
@@ -62,51 +64,19 @@ function fireball.new(owner, mult)
                * scale
     self.dmg = math.floor(self.dmg)
 
-    self.pushback = math.random() > (owner.power/100*scale)
+    self.pushback_power = math.random() > (owner.power/100*scale)
 
-    if self.pushback then
-        self.pushback = owner.power*scale
-    end
-
-    self.timer = 0
-
-    if not fireball.model then
-        fireball.model = iqm.load('assets/models/fireball.iqm')
-        fireball.model.textures = {}
-
-        fireball.model.textures['fireball.tga'] =
-            love.graphics.newImage('assets/textures/fireball.tga', {mipmaps = true})
-        fireball.model.textures['fireball.tga']:setFilter('nearest', 'linear')
+    if self.pushback_power then
+        self.pushback_power = owner.power*scale
     end
 
     return self
 end
 
-function fireball:draw()
-    gfx.set_shader(shader_static)
-
-    gfx.push()
-
-    gfx.transform(self.position,
-                  cpml.vec3(0, 0, self.rotation),
-                  self.owner.scale)
-    gfx.draw(fireball.model)
-
-    gfx.pop()
-end
-
 function fireball:update(dt)
     if self.timer > time then
         game.state.world:remove(self)
-    end
-
-    self.timer = self.timer + dt
-    
-    local vx, vy = self.velocity.x*dt, self.velocity.y*dt
-    self.position = self.position + cpml.vec3(vx, vy, 0.0)
-
-    if self.timer > time then
-        game.state.world:remove(self)
+        return
     end
 
     local world = game.state.world
@@ -116,9 +86,12 @@ function fireball:update(dt)
             if self:collision(e) then
                 self:hit(e)
                 game.state.world:remove(self)
+                return
             end
         end
     end
+
+    entity.update(self, dt)
 end
 
 function fireball:collision(e)
@@ -130,9 +103,9 @@ end
 
 function fireball:hit(e)
     e.health = e.health - (self.dmg - e.defense)
-    if self.pushback then
+    if self.pushback_power then
         local d = e.position - self.owner.position
-        e:pushback(d:normalize()*self.pushback)
+        e:pushback(d:normalize()*self.pushback_power)
     end
 end
 

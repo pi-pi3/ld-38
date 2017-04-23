@@ -27,88 +27,44 @@ local iqm = require('iqm')
 local cpml = require('cpml')
 local anim9 = require('anim9')
 local fireball = require('fireball')
+local entity = require('entity')
 
 local player = {}
+setmetatable(player, {__index = entity})
 local mt = {__index = player}
 
 local acc = 150
 local decc = 600
 local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
-local attack_delay = 0
+local attack_delay = 2
 
 function player.new(x, y, z)
-    local self = {}
+    local self = entity.new(x, y, z, 'roman.iqm', 
+                            {'djinni_body.tga', 'djinni_belt.tga', 
+                             'djinni_eye.tga', 'djinni_tail.tga'},
+                            {'walking'})
     setmetatable(self, mt)
 
     self.t = 'player'
 
-    self.velocity = cpml.vec2(0, 0)
-    self.position = cpml.vec3(x or 0, y or 0, z or 1)
-    self.rotation = 0 -- z only
-    self.scale = cpml.vec3(1, 1, 1)
-
     self.health = 42 -- The answer to life, the universe and everything.
+    self.health_max = 42
     self.strength = 5
     self.power = 5
     self.agility = 5
     self.defense = 5
 
-    self.timer = 0
-    self.float = 0
     self.attack_timer = attack_delay
 
     self.attacking = false
 
-    self.model = iqm.load('assets/models/roman.iqm')
-    self.model.textures = {}
-    self.model.anims = iqm.load_anims('assets/models/roman.iqm')
-    self.model.anim = anim9(self.model.anims)
-
-    self.walking = self.model.anim:add_track('walking')
-    self.walking.playing = true
-
-    self.model.textures['djinni_body.tga'] =
-        love.graphics.newImage('assets/textures/djinni_body.tga', {mipmaps = true})
-    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
-
-    self.model.textures['djinni_belt.tga'] =
-        love.graphics.newImage('assets/textures/djinni_belt.tga', {mipmaps = true})
-    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
-
-    self.model.textures['djinni_eye.tga'] =
-        love.graphics.newImage('assets/textures/djinni_eye.tga', {mipmaps = true})
-    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
-
-    self.model.textures['djinni_tail.tga'] =
-        love.graphics.newImage('assets/textures/djinni_tail.tga', {mipmaps = true})
-    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
-
     return self
 end
 
-function player:draw()
-    gfx.set_shader(shader_anim)
-
-    gfx.push()
-
-    gfx.transform(self.position+cpml.vec3(0, 0, self.float),
-                  cpml.vec3(0, 0, self.rotation),
-                  self.scale)
-    gfx.draw(self.model)
-
-    gfx.pop()
-end
-
 function player:update(dt)
-    self.model.anim:update(dt)
-
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
-    self.float = 0.5+math.sin(self.timer)*0.5
-
-    -- Update velocity
-    local vx, vy = self.velocity.x, self.velocity.y
 
     if self.attacking and self.dest then
         self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
@@ -119,6 +75,7 @@ function player:update(dt)
         self.attack_timer = 0
     end
 
+    -- Goto dest
     if self.dest then
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
 
@@ -130,42 +87,20 @@ function player:update(dt)
         end
 
         self.rotation = select(2, dir:to_polar())-math.pi*3/2
-        vx = 0
-        vy = util.clamp(vy - acc*dt, -max_vel, max_vel)
-    else 
-        if love.keyboard.isDown('w') then
-            vy = util.clamp(vy - acc*dt, -max_vel, max_vel)
-        elseif love.keyboard.isDown('s') then
-            vy = util.clamp(vy + acc*dt, -max_vel, max_vel)
-        else
-            vy = util.clamp(vy - decc*dt*util.sign(vy), 0, max_vel*util.sign(vy))
-        end
-
-        if love.keyboard.isDown('a') then
-            vx = util.clamp(vx - acc*dt, -max_vel, max_vel)
-        elseif love.keyboard.isDown('d') then
-            vx = util.clamp(vx + acc*dt, -max_vel, max_vel)
-        else
-            vx = util.clamp(vx - decc*dt*util.sign(vx), 0, max_vel*util.sign(vx))
-        end
+        vx = util.clamp(vx - dir.x*acc*dt, -max_vel, max_vel)
+        vy = util.clamp(vy - dir.y*acc*dt, -max_vel, max_vel)
     end
 
     self.velocity.x, self.velocity.y = vx, vy
-
-    local c, s = math.cos(self.rotation), math.sin(self.rotation)
-    local vx = self.velocity.x*dt
-    local vy = self.velocity.y*dt
-
-    -- Update position
-    self.position.x, self.position.y = 
-            self.position.x + vx*c - vy*s,
-            self.position.y + vy*c + vx*s
 
     -- Camera position
     game.state.camera.pos.x, game.state.camera.pos.y = 
             game.state.camera.pos.x + vx*c - vy*s,
             game.state.camera.pos.y + vy*c + vx*s
 
+    entity.update(self, dt)
+
+    -- TODO: remove and replace
     -- A cheaty way to get mouse aiming
     local w, h = love.graphics.getDimensions()
     local mx, my = love.mouse.getPosition()
@@ -175,22 +110,6 @@ function player:update(dt)
     self.rotation = self.rotation + game.state.camera.rot.z
 end
 
-function player:moveto(x, y)
-    local pos
-    if x and not y then
-        pos = x
-    else
-        pos = cpml.vec2(x, y)
-    end
-
-    self.dest = pos
-end
-
-function player:attack(enemy)
-    self.attacking = enemy
-end
-
-
 function player:mousepressed(mx, my, button)
     if button == 2 then
         if self.attack_timer > attack_delay then
@@ -198,19 +117,6 @@ function player:mousepressed(mx, my, button)
             self.attack_timer = 0
         end
     end
-end
-
-function player:keypressed(key)
-    self.dest = nil
-    self.attacking = false
-end
-
-function player:dir()
-    return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))
-end
-
-function player:pushback(v)
-    -- TODO
 end
 
 return player
