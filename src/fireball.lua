@@ -65,7 +65,7 @@ function fireball.new(owner, mult)
                * scale
     self.dmg = math.floor(self.dmg)
 
-    self.pushback_power = math.random() > (owner.power/100*scale)
+    self.pushback_power = math.random() < (owner.power/100*scale)
 
     if self.pushback_power then
         self.pushback_power = owner.power*scale*1000
