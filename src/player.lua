@@ -64,13 +64,19 @@ function player:update(dt)
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
 
-    if self.attacking and self.dest then
-        self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
-    end
+    if self.attacking then
+        if self.dest then
+            self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
+        end
 
-    if self.attacking and self.attack_timer > attack_delay then
-        game.state.world:insert(fireball.new(self))
-        self.attack_timer = 0
+        if self.attack_timer > attack_delay then
+            game.state.world:insert(fireball.new(self))
+            self.attack_timer = 0
+        end
+
+        if not self.attacking:alive() then
+            self.attacking = nil
+        end
     end
 
     local vx, vy = self.velocity.x, self.velocity.y 

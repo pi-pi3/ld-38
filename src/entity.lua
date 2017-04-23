@@ -108,7 +108,7 @@ function entity:draw()
 end
 
 function entity:update(dt)
-    if self.health <= 0 then
+    if not self:alive() then
         game.state.world:remove(self)
     end
 
@@ -151,6 +151,10 @@ function entity:moveto(x, y)
     end
 
     self.dest = pos
+
+    local d = (self.dest - cpml.vec2(self.position.x, self.position.y))
+    local rot = select(2, d:to_polar())-math.pi*1.5
+    self.rotation = rot
 end
 
 function entity:attack(enemy)
@@ -167,6 +171,10 @@ function entity:pushback(v)
 
     local t = 1000/self.weight
     self.anti_force = -self.force/(1000*t)
+end
+
+function entity:alive()
+    return self.health > 0
 end
 
 return entity
