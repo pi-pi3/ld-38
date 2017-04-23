@@ -26,11 +26,13 @@ local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
 local anim9 = require('anim9')
+local sword = require('sword')
 
 local enemy = {}
 local mt = {__index = enemy}
 
 local max_vel = 2.5
+local attack_delay = 2
 
 --[[ AI (simplified)
          found
@@ -57,6 +59,7 @@ function enemy.new(x, y, z)
     self.scale = cpml.vec3(1, 1, 1)
 
     self.health = 12
+    self.health_max = 12
     self.strength = 2
     self.power = 2
     self.agility = 3
@@ -66,6 +69,8 @@ function enemy.new(x, y, z)
     self.searching = {timer = 0,
                       rot = 0,
                       dst = {}}
+    self.attacking = false
+    self.attack_timer = attack_delay
 
     self.scale = cpml.vec3(1, 1, 1)
     self.model = iqm.load('assets/models/ball.iqm')
@@ -92,10 +97,23 @@ function enemy:draw()
     gfx.draw(self.model)
 
     gfx.pop()
+
+    if self.sword and self.sword:alive() then
+        self.sword:draw()
+    end
 end
 
 function enemy:update(dt)
+    self.attack_timer = self.attack_timer + dt
     self.model.anim:update(dt)
+
+    if self.sword then
+        if self.sword:alive() then
+            self.sword:update(dt)
+        else
+            self.sword = nil
+        end
+    end
 
     local player = game.state.world.entities.player
 
@@ -128,8 +146,7 @@ function enemy:idle(dt, player)
         self.searching.dst = player.position
     end
 
-    -- TODO: make this into 1/4 max hp
-    if self.health < 3.0 then
+    if self.health < self.health_max*0.25 then
         self.state = 'fleeing'
     end
 
@@ -163,8 +180,7 @@ function enemy:search(dt, player)
         self.velocity = cpml.vec2(math.sin(rot), -math.cos(rot))
     end
 
-    -- TODO: make this into 1/4 max hp
-    if self.health < 3.0 then
+    if self.health < self.health_max*0.25 then
         self.state = 'fleeing'
     end
 
@@ -183,20 +199,25 @@ function enemy:attack(dt, player)
     if distance > 64.0 then
         self.state = 'idle' -- XXX He's too far, let's forget he exists.
         self.velocity = cpml.vec2(0, 0)
+        self.attacking = false
     elseif distance > 6.25 then
         self.velocity = d*2 -- XXX GET HIM!
 
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
+        self.attacking = player
     else
-        -- attack
-        self.velocity = cpml.vec2(0, 0)
+        if not self.sword and self.attack_timer > 3 then
+            self.sword = sword.new(self)
+            self.attack_timer = 0
+        end
 
+        self.velocity = cpml.vec2(0, 0)
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     end
 
-    -- TODO: make this into 1/4 max hp
-    if self.health < 3.0 then
+    if self.health < self.health_max*0.25 then
         self.state = 'fleeing'
+        self.attacking = false
     end
 end
 

@@ -36,6 +36,7 @@ function sword.new(owner, mult)
 
     self.t = 'sword'
     self.health = 1
+    self.rotation = 0
 
     -- Big things hit hard, right?
     local scale = owner.scale.x * owner.scale.y * owner.scale.z
@@ -80,7 +81,7 @@ function sword:draw()
 
     gfx.push()
 
-    gfx.transform(self.owner.position+cpml.vec3(0, 0, self.owner.float+1.5),
+    gfx.transform(self.owner.position+cpml.vec3(0, 0, 1.5),
                   cpml.vec3(0, 0, self.owner.rotation+self.rotation),
                   self.owner.scale)
     gfx.draw(sword.model)

@@ -208,11 +208,15 @@ end
 
 function player:keypressed(key)
     self.dest = nil
-    self.attacking = nil
+    self.attacking = false
 end
 
 function player:dir()
     return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))
+end
+
+function player:pushback(v)
+    -- TODO
 end
 
 return player
