@@ -99,17 +99,9 @@ function player:update(dt)
             game.state.camera.pos.y + self.velocity.y*dt
 
     entity.update(self, dt)
-
-    -- TODO: remove and replace
-    -- A cheaty way to get mouse aiming
-    local w, h = love.graphics.getDimensions()
-    local mx, my = love.mouse.getPosition()
-    local p = cpml.vec2(mx-w/2, my-h/2+16)
-    p = p:normalize()
-    self.rotation = select(2, p:to_polar())-math.pi*3/2
-    self.rotation = self.rotation + game.state.camera.rot.z
 end
 
+-- TODO: rotate to shoot
 function player:mousepressed(mx, my, button)
     if button == 2 then
         if self.attack_timer > attack_delay then
