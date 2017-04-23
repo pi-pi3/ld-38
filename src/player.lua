@@ -23,9 +23,7 @@
 ]]
 
 local util = require('util')
-local iqm = require('iqm')
 local cpml = require('cpml')
-local anim9 = require('anim9')
 local fireball = require('fireball')
 local entity = require('entity')
 
