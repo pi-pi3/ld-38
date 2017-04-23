@@ -62,21 +62,21 @@ function player.new(x, y, z)
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
 
-    self.model.textures.djinni_body =
+    self.model.textures['djinni_body.tga'] =
         love.graphics.newImage('assets/textures/djinni_body.tga', {mipmaps = true})
-    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
 
-    self.model.textures.djinni_belt =
+    self.model.textures['djinni_belt.tga'] =
         love.graphics.newImage('assets/textures/djinni_belt.tga', {mipmaps = true})
-    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
 
-    self.model.textures.djinni_eye =
+    self.model.textures['djinni_eye.tga'] =
         love.graphics.newImage('assets/textures/djinni_eye.tga', {mipmaps = true})
-    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
 
-    self.model.textures.djinni_tail =
+    self.model.textures['djinni_tail.tga'] =
         love.graphics.newImage('assets/textures/djinni_tail.tga', {mipmaps = true})
-    self.model.textures.djinni_body:setFilter('nearest', 'nearest')
+    self.model.textures['djinni_body.tga']:setFilter('nearest', 'nearest')
 
     return self
 end
