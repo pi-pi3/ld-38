@@ -22,6 +22,8 @@
     distribution.
 ]]
 
+love.filesystem.setRequirePath('?.lua;?/init.lua;lib/?.lua;lib/?/init.lua;?/?.lua')
+
 l3d = require('love3d')
 l3d.import(true)
 
