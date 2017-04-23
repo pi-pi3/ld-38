@@ -45,7 +45,6 @@ function player.new(x, y, z)
     setmetatable(self, mt)
 
     self.t = 'player'
-    self.gravity = false
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
