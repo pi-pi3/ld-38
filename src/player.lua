@@ -54,8 +54,8 @@ function player.new(x, y, z)
     self.max_vel = 6
 
     self.attack_timer = attack_delay
-
     self.attacking = false
+    self.shooting = 0
 
     return self
 end
@@ -63,6 +63,10 @@ end
 function player:update(dt)
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
+
+    if self.shooting > 0 then
+        self.shooting = self.shooting - dt
+    end
 
     if self.attacking then
         if self.dest then
@@ -107,13 +111,26 @@ function player:update(dt)
     entity.update(self, dt)
 end
 
--- TODO: rotate to shoot
 function player:mousepressed(mx, my, button)
     if button == 2 then
         if self.attack_timer > attack_delay then
             game.state.world:insert(fireball.new(self))
             self.attack_timer = 0
         end
+    end
+end
+
+function player:moveto(x, y)
+    local pos
+    if x and not y then
+        pos = x
+    else
+        pos = cpml.vec2(x, y)
+    end
+
+    self.dest = pos
+    if self.shooting == 0 then
+        self:lookat(pos)
     end
 end
 
