@@ -7,6 +7,6 @@
 [submodule "lib/iqm"]
 	path = lib/iqm
 	url = https://github.com/excessive/iqm
-[submodule "lbi/anim9"]
+[submodule "lib/anim9"]
 	path = lib/anim9
 	url = https://github.com/excessive/anim9
