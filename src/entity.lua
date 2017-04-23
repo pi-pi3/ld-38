@@ -30,16 +30,18 @@ local anim9 = require('anim9')
 local entity = {}
 local mt = {__index = entity}
 
-function entity.new(x, y, z, model, textures, anim)
+function entity.new(x, y, z, model, textures, anim, bbox)
     local self = {}
     setmetatable(self, mt)
 
     self.t = 'entity'
 
-    self.velocity = cpml.vec2(0, 0)
+    self.velocity = cpml.vec3(0, 0, 0)
     self.position = cpml.vec3(x or 0, y or 0, z or 0)
     self.rotation = 0 -- z only
     self.scale = cpml.vec3(1, 1, 1)
+    self.bbox = bbox
+    self.gravity = true
 
     self.health = 5
     self.health_max = 5
@@ -108,8 +110,8 @@ function entity:draw()
 end
 
 function entity:update(dt)
-    if self.health <= 0 then
-        game.state.world:remove(self)
+    if not self:alive() then
+        self:die()
     end
 
     if self.anim then
@@ -140,6 +142,19 @@ function entity:update(dt)
     self.position.x, self.position.y = 
             self.position.x + self.velocity.x*dt,
             self.position.y + self.velocity.y*dt
+
+    -- Gravity
+    if self.gravity then
+        if not self:on_ground() then
+            self.falling = true
+            self.velocity.z = self.velocity.z + game.state.world.gravity*dt
+            self.position.z = self.position.z + self.velocity.z*dt
+
+            if self.position.z < 64 then
+                self:die()
+            end
+        end
+    end
 end
 
 function entity:moveto(x, y)
@@ -151,6 +166,20 @@ function entity:moveto(x, y)
     end
 
     self.dest = pos
+    self:lookat(pos)
+end
+
+function entity:lookat(x, y)
+    local pos
+    if x and not y then
+        pos = x
+    else
+        pos = cpml.vec2(x, y)
+    end
+
+    local d = pos - cpml.vec2(self.position.x, self.position.y)
+    local rot = select(2, d:to_polar())-math.pi*1.5
+    self.rotation = rot
 end
 
 function entity:attack(enemy)
@@ -162,11 +191,41 @@ function entity:dir()
 end
 
 function entity:pushback(v)
-    self.velocity = cpml.vec2(0, 0)
+    self.velocity = cpml.vec3(0, 0, 0)
     self.force = v
 
     local t = 1000/self.weight
     self.anti_force = -self.force/(1000*t)
+end
+
+function entity:alive()
+    return self.health > 0
+end
+
+function entity:die()
+    self.health = -1
+    game.state.world:remove(self)
+end
+
+local function p_on_ground(px, py, ox, oy)
+    local world = game.state.world.world
+    return world[py+oy] and world[py+oy][px+ox] and true or false
+end
+
+function entity:on_ground()
+    if self.falling then
+        return false
+    end
+
+    local px, py = math.floor((self.position.x+9)*0.5),
+                   math.floor((self.position.y+9)*0.5)
+
+    local on_ground = p_on_ground(px, py, 0, 0)
+                   or p_on_ground(px, py, self.bbox.w, 0)
+                   or p_on_ground(px, py, 0, self.bbox.h)
+                   or p_on_ground(px, py, self.bbox.w, self.bbox.h)
+
+    return on_ground
 end
 
 return entity

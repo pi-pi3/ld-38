@@ -56,7 +56,7 @@ function game.load()
 
     local w, h = 8, 8
     game.world = world.gen(w, h)
-    game.camera = {pos = cpml.vec3(0, 6, 10),
+    game.camera = {pos = cpml.vec3(0, 8, 12),
                    rot = cpml.vec3(theta, 0, 0),
                    proj = gfx.projection(fov, width/height, near, far)}
 
@@ -101,10 +101,12 @@ function game.draw()
 end
 
 function game.mousepressed(mx, my, button)
+    local player = game.world.entities.player
+    local p = gfx.unproject(mx, my, math.rad(fov), near, far,
+                            gfx.matrix())
+
     if button == 1 then
-        local p = gfx.unproject(mx, my, math.rad(fov), near, far,
-                                gfx.matrix())
-        game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+        player:moveto(cpml.vec2(p.x, p.y))
 
         local near, d = game.world:nearest(p)
         if near.t == 'enemy' and d < 2.5 then
@@ -112,6 +114,9 @@ function game.mousepressed(mx, my, button)
         elseif d > 2.5 then
             game.world.entities.player:attack(nil)
         end
+    elseif button == 2 then
+        player.shooting = 0.5
+        player:lookat(cpml.vec2(p.x, p.y))
     end
 
     game.world:mousepressed(mx, my, button)
@@ -119,10 +124,11 @@ end
 
 function game.mousemoved(mx, my, dx, dy)
     if love.mouse.isDown(1) and game.world.entities.player.dest then
-        -- TODO: rotate player
         local p = gfx.unproject(mx, my, math.rad(fov), near, far,
                                 gfx.matrix())
-        game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+
+        local player = game.world.entities.player
+        player:moveto(cpml.vec2(p.x, p.y))
     end
 end
 

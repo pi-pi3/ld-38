@@ -23,11 +23,10 @@
 ]]
 
 local util = require('util')
-local iqm = require('iqm')
 local cpml = require('cpml')
-local anim9 = require('anim9')
 local fireball = require('fireball')
 local entity = require('entity')
+local rect = require('rect')
 
 local player = {}
 setmetatable(player, {__index = entity})
@@ -42,10 +41,11 @@ function player.new(x, y, z)
     local self = entity.new(x, y, z, 'roman.iqm', 
                             {'djinni_body.tga', 'djinni_belt.tga', 
                              'djinni_eye.tga', 'djinni_tail.tga'},
-                            'walking')
+                            'walking', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'player'
+    self.gravity = false
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
@@ -54,10 +54,11 @@ function player.new(x, y, z)
     self.agility = 5
     self.defense = 5
     self.max_vel = 6
+    self.range2 = 60
 
     self.attack_timer = attack_delay
-
     self.attacking = false
+    self.shooting = 0
 
     return self
 end
@@ -66,13 +67,23 @@ function player:update(dt)
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
 
-    if self.attacking and self.dest then
-        self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
+    if self.shooting > 0 then
+        self.shooting = self.shooting - dt
     end
 
-    if self.attacking and self.attack_timer > attack_delay then
-        game.state.world:insert(fireball.new(self))
-        self.attack_timer = 0
+    if self.attacking then
+        if self.dest then
+            self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
+        end
+
+        if self.attack_timer > attack_delay then
+            game.state.world:insert(fireball.new(self))
+            self.attack_timer = 0
+        end
+
+        if not self.attacking:alive() then
+            self.attacking = nil
+        end
     end
 
     local vx, vy = self.velocity.x, self.velocity.y 
@@ -81,7 +92,7 @@ function player:update(dt)
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
 
         local min_dist = 1
-        if self.attacking then min_dist = 6.25 end
+        if self.attacking then min_dist = self.range2 end
 
         if dir:len2() < min_dist then
             self.dest = nil
@@ -101,15 +112,6 @@ function player:update(dt)
             game.state.camera.pos.y + self.velocity.y*dt
 
     entity.update(self, dt)
-
-    -- TODO: remove and replace
-    -- A cheaty way to get mouse aiming
-    local w, h = love.graphics.getDimensions()
-    local mx, my = love.mouse.getPosition()
-    local p = cpml.vec2(mx-w/2, my-h/2+16)
-    p = p:normalize()
-    self.rotation = select(2, p:to_polar())-math.pi*3/2
-    self.rotation = self.rotation + game.state.camera.rot.z
 end
 
 function player:mousepressed(mx, my, button)
@@ -118,6 +120,20 @@ function player:mousepressed(mx, my, button)
             game.state.world:insert(fireball.new(self))
             self.attack_timer = 0
         end
+    end
+end
+
+function player:moveto(x, y)
+    local pos
+    if x and not y then
+        pos = x
+    else
+        pos = cpml.vec2(x, y)
+    end
+
+    self.dest = pos
+    if self.shooting == 0 then
+        self:lookat(pos)
     end
 end
 

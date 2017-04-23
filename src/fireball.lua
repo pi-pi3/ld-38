@@ -40,6 +40,7 @@ function fireball.new(owner, mult)
 
     self.t = 'fireball'
     self.health = 1
+    self.gravity = false
 
     local rot = owner.rotation
     self.rotation = rot
@@ -50,7 +51,7 @@ function fireball.new(owner, mult)
     -- Big things hit hard, right?
     local scale = owner.scale.x * owner.scale.y * owner.scale.z
     local scale2 = owner.scale.x * owner.scale.y
-    self.radius2 = scale2*scale2*4
+    self.radius2 = scale2*scale2
 
     self.owner = owner
     -- high power, low agility means your damage is going to vary (A LOT)
