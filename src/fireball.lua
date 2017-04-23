@@ -40,6 +40,7 @@ function fireball.new(owner, mult)
 
     self.t = 'fireball'
     self.health = 1
+    self.gravity = false
 
     local rot = owner.rotation
     self.rotation = rot

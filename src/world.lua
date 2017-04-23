@@ -46,6 +46,8 @@ function world.gen(w, h)
     self.width = w
     self.height = h
 
+    self.gravity = -3000.0
+
     for i = 1, self.height do
         self.world[i] = {}
         for j = 1, self.width do
@@ -57,7 +59,7 @@ function world.gen(w, h)
 end
 
 function world:update(dt)
-    for _, e in pairs(self.entities) do
+    for k, e in pairs(self.entities) do
         if e.update then
             e:update(dt)
         end

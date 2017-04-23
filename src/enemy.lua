@@ -26,6 +26,7 @@ local util = require('util')
 local cpml = require('cpml')
 local sword = require('sword')
 local entity = require('entity')
+local rect = require('rect')
 
 local enemy = {}
 setmetatable(enemy, {__index = entity})
@@ -47,7 +48,8 @@ local attack_delay = 1
 ]]
 
 function enemy.new(x, y, z)
-    local self = entity.new(x, y, z, 'skeleton.iqm', nil, 'standing')
+    local self = entity.new(x, y, z, 'skeleton.iqm', nil, 'standing',
+                            rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'enemy'
@@ -74,14 +76,16 @@ end
 function enemy:update(dt)
     local player = game.state.world.entities.player
 
-    if self.state == 'idle' then 
-        self:idle(dt, player)
-    elseif self.state == 'searching' then 
-        self:search(dt, player)
-    elseif self.state == 'attacking' then 
-        self:attack(dt, player)
-    elseif self.state == 'fleeing' then 
-        self:flee(dt, player)
+    if not self.falling then
+        if self.state == 'idle' then 
+            self:idle(dt, player)
+        elseif self.state == 'searching' then 
+            self:search(dt, player)
+        elseif self.state == 'attacking' then 
+            self:attack(dt, player)
+        elseif self.state == 'fleeing' then 
+            self:flee(dt, player)
+        end
     end
 
     entity.update(self, dt)
@@ -157,7 +161,7 @@ function enemy:idle(dt, player)
         self.searching.dst = player.position
     end
 
-    self.velocity = cpml.vec2(0, 0)
+    self.velocity = cpml.vec3(0, 0)
     self:stand()
 end
 
@@ -167,7 +171,7 @@ function enemy:search(dt, player)
 
     if distance > 64.0 then
         self.state = 'idle' -- XXX Must've been the wind.
-        self.velocity = cpml.vec2(0, 0)
+        self.velocity = cpml.vec3(0, 0)
     elseif distance < 16.0 then
         self.state = 'attacking'
     else -- Walk into players general direction
@@ -185,7 +189,7 @@ function enemy:search(dt, player)
 
         rot = rot + self.searching.rot
 
-        self.velocity = cpml.vec2(math.sin(rot), -math.cos(rot))*self.max_vel
+        self.velocity = cpml.vec3(math.sin(rot), -math.cos(rot))*self.max_vel
 
         self.rotation = rot
         self:walk()
@@ -203,7 +207,7 @@ function enemy:attack(dt, player)
 
     if distance > 64.0 then
         self.state = 'idle' -- XXX He's too far, let's forget he exists.
-        self.velocity = cpml.vec2(0, 0)
+        self.velocity = cpml.vec3(0, 0)
         self.attacking = false
     elseif distance > 6.25 then
         self.velocity = d*self.max_vel*2 -- XXX GET HIM!
@@ -220,7 +224,7 @@ function enemy:attack(dt, player)
             self:stand()
         end
 
-        self.velocity = cpml.vec2(0, 0)
+        self.velocity = cpml.vec3(0, 0)
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*0.5
     end
 
@@ -236,7 +240,7 @@ function enemy:flee(dt, player)
 
     if distance > 64.0 then
         self.state = 'idle' -- XXX He's too far, let's forget he exists
-        self.velocity = cpml.vec2(0, 0)
+        self.velocity = cpml.vec3(0, 0)
     else
         self.velocity = -d:normalize()*self.max_vel*2 -- XXX RUN AWAY!
 

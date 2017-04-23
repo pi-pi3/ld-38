@@ -26,6 +26,7 @@ local util = require('util')
 local cpml = require('cpml')
 local fireball = require('fireball')
 local entity = require('entity')
+local rect = require('rect')
 
 local player = {}
 setmetatable(player, {__index = entity})
@@ -40,14 +41,15 @@ function player.new(x, y, z)
     local self = entity.new(x, y, z, 'roman.iqm', 
                             {'djinni_body.tga', 'djinni_belt.tga', 
                              'djinni_eye.tga', 'djinni_tail.tga'},
-                            'walking')
+                            'walking', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'player'
+    self.gravity = false
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = 8
+    self.strength = -8
     self.power = 20
     self.agility = 5
     self.defense = 5
