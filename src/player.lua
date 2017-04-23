@@ -25,7 +25,7 @@
 local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
-local sword = require('sword')
+local fireball = require('fireball')
 
 local player = {}
 local mt = {__index = player}
@@ -61,6 +61,11 @@ function player.new(x, y, z)
 
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
+    self.model.anims = iqm.load_anims('assets/models/skeleton.iqm')
+    self.model.anim = anim9(self.model.anims)
+
+    self.walking = self.model.anim:add_track('walking')
+    self.walking.playing = true
 
     self.model.textures['djinni_body.tga'] =
         love.graphics.newImage('assets/textures/djinni_body.tga', {mipmaps = true})
@@ -93,8 +98,8 @@ function player:draw()
 
     gfx.pop()
 
-    if self.sword and self.sword:alive() then
-        self.sword:draw()
+    if self.fireball and self.fireball:alive() then
+        self.fireball:draw()
     end
 end
 
@@ -111,17 +116,18 @@ function player:update(dt)
     end
 
     if self.attacking then
-        if not self.sword and self.attack_timer > 3 then
-            self.sword = sword.new(self)
+        if not self.fireball and self.attack_timer > 3 then
+            -- TODO:
+            game.state.world:insert(fireball.new(self))
             self.attack_timer = 0
         end
     end
 
-    if self.sword then
-        if self.sword:alive() then
-            self.sword:update(dt)
+    if self.fireball then
+        if self.fireball:alive() then
+            self.fireball:update(dt)
         else
-            self.sword = nil
+            self.fireball = nil
         end
     end
 
@@ -199,8 +205,8 @@ end
 
 function player:mousepressed(mx, my, button)
     if button == 2 then
-        if not self.sword and self.attack_timer > attack_delay then
-            self.sword = sword.new(self)
+        if not self.fireball and self.attack_timer > attack_delay then
+            self.fireball = fireball.new(self)
             self.attack_timer = 0
         end
     end
