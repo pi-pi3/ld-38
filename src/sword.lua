@@ -28,6 +28,8 @@ local iqm = require('iqm')
 local sword = {}
 local mt = {__index = sword}
 
+local time = 0.75
+
 function sword.new(owner, mult)
     local self = {}
     setmetatable(self, mt)
@@ -74,6 +76,8 @@ function sword.new(owner, mult)
 end
 
 function sword:draw()
+    gfx.set_shader(shader_static)
+
     gfx.push()
 
     gfx.transform(self.owner.position+cpml.vec3(0, 0, self.owner.float+1.5),
@@ -85,12 +89,12 @@ function sword:draw()
 end
 
 function sword:update(dt)
-    if self.timer > math.pi then
+    if self.timer > time then
         self.health = 0
     end
 
     self.timer = self.timer + dt
-    self.rotation = math.sin(self.timer*2.0)
+    self.rotation = math.sin(self.timer*(math.pi/time)*0.5)
 
     if self.timer > math.pi*0.5 then
         self.health = 0

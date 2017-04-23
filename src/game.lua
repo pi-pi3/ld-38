@@ -41,11 +41,16 @@ function game.load()
     love.graphics.setBlendMode('replace')
 
     -- this probably shouldn't be global
-    declare('shader')
+    declare('shader_static')
+    declare('shader_anim')
 
-    game.shader = love.graphics.newShader('assets/shaders/shader.glsl')
-    shader = game.shader
-    love.graphics.setShader(game.shader)
+    game.shader_static = love.graphics.newShader('assets/shaders/static.glsl')
+    shader_static = game.shader_static
+
+    game.shader_anim = love.graphics.newShader('assets/shaders/anim.glsl')
+    shader_anim = game.shader_anim
+
+    gfx.set_shader(game.shader_static)
 
     local width, height = love.graphics.getDimensions()
 
@@ -75,6 +80,8 @@ function game.update(dt)
 end
 
 function game.draw()
+    gfx.set_shader(shader_static)
+
     gfx.identity()
 
     l3d.set_depth_write(false)
@@ -87,9 +94,8 @@ function game.draw()
     l3d.set_depth_write(true)
 
     gfx.camera(game.camera.pos, game.camera.rot, nil,
-               game.world.entities.player.position)
-
-    game.shader:send('u_proj', game.camera.proj:to_vec4s())
+               game.world.entities.player.position,
+               game.camera.proj)
 
     game.world:draw()
 end
@@ -105,16 +111,20 @@ function game.keypressed(key, scancode, isrepeat)
 end
 
 function game.mousepressed(mx, my, button)
-    local p = gfx.unproject(mx, my, math.rad(fov), near, far,
-                            gfx.matrix())
-    game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
+    if button == 1 then
+        local p = gfx.unproject(mx, my, math.rad(fov), near, far,
+                                gfx.matrix())
+        game.world.entities.player:moveto(cpml.vec2(p.x, p.y))
 
-    local near, d = game.world:nearest(p)
-    if near.t == 'enemy' and d < 2.5 then
-        game.world.entities.player:attack(near)
-    elseif d > 2.5 then
-        game.world.entities.player:attack(nil)
+        local near, d = game.world:nearest(p)
+        if near.t == 'enemy' and d < 2.5 then
+            game.world.entities.player:attack(near)
+        elseif d > 2.5 then
+            game.world.entities.player:attack(nil)
+        end
     end
+
+    game.world:mousepressed(mx, my, button)
 end
 
 function game.mousemoved(mx, my, dx, dy)

@@ -26,9 +26,25 @@ local cpml = require('cpml')
 local util = require('util')
 
 local gfx = {}
+
 gfx.matrix_stack = {}
 gfx.matrix_stack[1] = cpml.mat4()
 cpml.mat4.identity(gfx.matrix_stack[1])
+
+gfx.proj = cpml.mat4()
+
+gfx.shader = {}
+gfx.sent = {model = false, proj = false}
+
+function gfx.set_shader(shader)
+    if shader == gfx.shader then
+        return
+    end
+
+    love.graphics.setShader(shader)
+    gfx.shader = shader
+    gfx.sent = {model = false, proj = false}
+end
 
 function gfx.matrix()
     return gfx.matrix_stack[#gfx.matrix_stack]
@@ -49,7 +65,8 @@ end
 function gfx.identity()
     local m = gfx.matrix()
     cpml.mat4.identity(m)
-    shader:send('u_model', m:to_vec4s())
+    gfx.shader:send('u_model', m:to_vec4s())
+    gfx.sent.model = true
 end
 
 function gfx.projection(fov, aspect, n, f)
@@ -75,10 +92,11 @@ function gfx.transform(pos, rot, scale)
     cpml.mat4.rotate(m, m, rot.z, cpml.vec3(0, 0, 1))
     cpml.mat4.scale(m, m, scale)
 
-    shader:send('u_model', m:to_vec4s())
+    gfx.shader:send('u_model', m:to_vec4s())
+    gfx.sent.model = true
 end
 
-function gfx.camera(pos, rot, scale, origin)
+function gfx.camera(pos, rot, scale, origin, proj)
     pos = pos or cpml.vec3(0, 0, 0)
     rot = rot or cpml.vec3(0, 0, 0)
     scale = scale or cpml.vec3(1, 1, 1)
@@ -95,10 +113,31 @@ function gfx.camera(pos, rot, scale, origin)
     cpml.mat4.translate(m, m, origin)
     cpml.mat4.translate(m, m, -pos)
 
-    shader:send('u_model', m:to_vec4s())
+    gfx.shader:send('u_model', m:to_vec4s())
+    gfx.sent.model = true
+
+    if proj then
+        gfx.shader:send('u_proj', proj:to_vec4s())
+        gfx.sent.proj = true
+        gfx.proj = proj
+    end
 end
 
 function gfx.draw(model)
+    if model.anim then
+        gfx.shader:send('u_pose', unpack(model.anim.current_pose))
+    end
+
+    if not gfx.sent.model then
+        gfx.shader:send('u_model', gfx.matrix():to_vec4s())
+        gfx.sent.model = true
+    end
+
+    if not gfx.sent.proj then
+        gfx.shader:send('u_proj', gfx.proj:to_vec4s())
+        gfx.sent.proj = true
+    end
+
     for _, buffer in ipairs(model) do
         local texture = model.textures[buffer.material]
         model.mesh:setTexture(texture)

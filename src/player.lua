@@ -34,6 +34,7 @@ local acc = 150
 local decc = 600
 local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
+local attack_delay = 2
 
 function player.new(x, y, z)
     local self = {}
@@ -54,7 +55,7 @@ function player.new(x, y, z)
 
     self.timer = 0
     self.float = 0
-    self.attack_timer = 0
+    self.attack_timer = attack_delay
 
     self.attacking = false
 
@@ -81,6 +82,8 @@ function player.new(x, y, z)
 end
 
 function player:draw()
+    gfx.set_shader(shader_static)
+
     gfx.push()
 
     gfx.transform(self.position+cpml.vec3(0, 0, self.float),
@@ -194,8 +197,18 @@ function player:attack(enemy)
 end
 
 
+function player:mousepressed(mx, my, button)
+    if button == 2 then
+        if not self.sword and self.attack_timer > attack_delay then
+            self.sword = sword.new(self)
+            self.attack_timer = 0
+        end
+    end
+end
+
 function player:keypressed(key)
     self.dest = nil
+    self.attacking = nil
 end
 
 function player:dir()

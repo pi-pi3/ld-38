@@ -25,6 +25,7 @@
 local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
+local anim9 = require('anim9')
 
 local enemy = {}
 local mt = {__index = enemy}
@@ -67,13 +68,22 @@ function enemy.new(x, y, z)
                       dst = {}}
 
     self.scale = cpml.vec3(1, 1, 1)
-    self.model = iqm.load('assets/models/enemy.iqm')
+    self.model = iqm.load('assets/models/ball.iqm')
     self.model.textures = {}
+    self.model.anims = iqm.load_anims('assets/models/ball.iqm')
+    self.model.anim = anim9(self.model.anims)
+    assert(self.model.anim)
+
+    local anim1 = self.model.anim:add_track("spin")
+    anim1.playing = true
+    anim1.lock = true
 
     return self
 end
 
 function enemy:draw()
+    gfx.set_shader(shader_anim)
+
     gfx.push()
 
     gfx.transform(self.position,
@@ -85,6 +95,8 @@ function enemy:draw()
 end
 
 function enemy:update(dt)
+    self.model.anim:update(dt)
+
     local player = game.state.world.entities.player
 
     if self.state == 'idle' then 

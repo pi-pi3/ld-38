@@ -49,6 +49,8 @@ function block.new(block_type)
 end
 
 function block:draw(x, y, z)
+    gfx.set_shader(shader_static)
+
     local pos
     if x and not y and not z then
         pos = x

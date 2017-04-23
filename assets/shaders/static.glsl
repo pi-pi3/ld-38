@@ -4,6 +4,7 @@ varying vec3 f_normal;
 #ifdef VERTEX
 
 attribute vec3 VertexNormal;
+
 uniform mat4 u_model;
 uniform mat4 u_proj;
 
