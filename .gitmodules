@@ -7,3 +7,6 @@
 [submodule "src/iqm"]
 	path = src/iqm
 	url = https://github.com/excessive/iqm
+[submodule "src/anim9"]
+	path = src/anim9
+	url = https://github.com/excessive/anim9
