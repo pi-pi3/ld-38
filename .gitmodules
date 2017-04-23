@@ -1,12 +1,12 @@
-[submodule "love3d"]
-	path = src/love3d
+[submodule "lib/love3d"]
+	path = lib/love3d
 	url = https://github.com/excessive/love3d
-[submodule "src/cpml"]
-	path = src/cpml
+[submodule "lib/cpml"]
+	path = lib/cpml
 	url = https://github.com/excessive/cpml
-[submodule "src/iqm"]
-	path = src/iqm
+[submodule "lib/iqm"]
+	path = lib/iqm
 	url = https://github.com/excessive/iqm
-[submodule "src/anim9"]
-	path = src/anim9
+[submodule "lbi/anim9"]
+	path = lib/anim9
 	url = https://github.com/excessive/anim9
