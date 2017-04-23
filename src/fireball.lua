@@ -97,7 +97,7 @@ end
 
 function fireball:update(dt)
     if self.timer > time then
-        self.health = 0
+        game.state.world:remove(self)
     end
 
     self.timer = self.timer + dt
@@ -106,23 +106,23 @@ function fireball:update(dt)
     self.position = self.position + cpml.vec3(vx, vy, 0.0)
 
     if self.timer > time then
-        self.health = 0
+        game.state.world:remove(self)
     end
 
     local world = game.state.world
 
     for _, e in pairs(world.entities) do
-        if e ~= self.owner then
+        if e ~= self.owner and e ~= self then
             if self:collision(e) then
                 self:hit(e)
-                self.health = 0
+                game.state.world:remove(self)
             end
         end
     end
 end
 
 function fireball:collision(e)
-    local d = e.position - self.owner.position
+    local d = e.position - self.position
     d = cpml.vec2(d.x, d.y)
 
     return d:len2() < self.radius2
@@ -134,10 +134,6 @@ function fireball:hit(e)
         local d = e.position - self.owner.position
         e:pushback(d:normalize()*self.pushback)
     end
-end
-
-function fireball:alive()
-    return self.health > 0
 end
 
 return fireball

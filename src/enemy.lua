@@ -137,6 +137,10 @@ function enemy:update(dt)
     self.attack_timer = self.attack_timer + dt
     self.model.anim:update(dt)
 
+    if self.health <= 0 then
+        game.state.world:remove(self)
+    end
+
     if self.sword then
         if self.sword:alive() then
             self.sword:update(dt)
@@ -174,10 +178,6 @@ function enemy:idle(dt, player)
         self.searching.timer = 0
         self.searching.rot = 0
         self.searching.dst = player.position
-    end
-
-    if self.health < self.health_max*0.25 then
-        self.state = 'fleeing'
     end
 
     self.velocity = cpml.vec2(0, 0)

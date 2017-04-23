@@ -25,6 +25,7 @@
 local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
+local anim9 = require('anim9')
 local fireball = require('fireball')
 
 local player = {}
@@ -34,7 +35,7 @@ local acc = 150
 local decc = 600
 local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
-local attack_delay = 2
+local attack_delay = 0
 
 function player.new(x, y, z)
     local self = {}
@@ -61,7 +62,7 @@ function player.new(x, y, z)
 
     self.model = iqm.load('assets/models/roman.iqm')
     self.model.textures = {}
-    self.model.anims = iqm.load_anims('assets/models/skeleton.iqm')
+    self.model.anims = iqm.load_anims('assets/models/roman.iqm')
     self.model.anim = anim9(self.model.anims)
 
     self.walking = self.model.anim:add_track('walking')
@@ -87,7 +88,7 @@ function player.new(x, y, z)
 end
 
 function player:draw()
-    gfx.set_shader(shader_static)
+    gfx.set_shader(shader_anim)
 
     gfx.push()
 
@@ -97,13 +98,11 @@ function player:draw()
     gfx.draw(self.model)
 
     gfx.pop()
-
-    if self.fireball and self.fireball:alive() then
-        self.fireball:draw()
-    end
 end
 
 function player:update(dt)
+    self.model.anim:update(dt)
+
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
     self.float = 0.5+math.sin(self.timer)*0.5
@@ -115,20 +114,9 @@ function player:update(dt)
         self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
     end
 
-    if self.attacking then
-        if not self.fireball and self.attack_timer > 3 then
-            -- TODO:
-            game.state.world:insert(fireball.new(self))
-            self.attack_timer = 0
-        end
-    end
-
-    if self.fireball then
-        if self.fireball:alive() then
-            self.fireball:update(dt)
-        else
-            self.fireball = nil
-        end
+    if self.attacking and self.attack_timer > attack_delay then
+        game.state.world:insert(fireball.new(self))
+        self.attack_timer = 0
     end
 
     if self.dest then
@@ -205,8 +193,8 @@ end
 
 function player:mousepressed(mx, my, button)
     if button == 2 then
-        if not self.fireball and self.attack_timer > attack_delay then
-            self.fireball = fireball.new(self)
+        if self.attack_timer > attack_delay then
+            game.state.world:insert(fireball.new(self))
             self.attack_timer = 0
         end
     end

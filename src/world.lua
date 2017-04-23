@@ -110,4 +110,21 @@ function world:nearest(pos, incl_player)
     return near.e, math.sqrt(near.d)
 end
 
+function world:insert(e)
+    table.insert(self.entities, e)
+end
+
+function world:remove(e)
+    if type(e) == 'number' then
+        table.remove(self.entities, e)
+        return
+    end
+
+    for k, v in pairs(self.entities) do
+        if v == e then
+            table.remove(self.entities, k)
+        end
+    end
+end
+
 return world

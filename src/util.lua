@@ -78,7 +78,7 @@ function util.ttostr(t, b, e, sep, recurse)
     b = b or '{'
     e = e or '}'
     sep = sep or ', '
-    recurse = (recurse ~= nil) and recurse or true
+    if recurse == nil then recurse = true end
 
     local str = b
     for k, v in pairs(t) do
