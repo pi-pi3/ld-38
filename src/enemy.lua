@@ -73,17 +73,47 @@ function enemy.new(x, y, z)
     self.attack_timer = attack_delay
 
     self.scale = cpml.vec3(1, 1, 1)
-    self.model = iqm.load('assets/models/ball.iqm')
+    self.model = iqm.load('assets/models/skeleton.iqm')
     self.model.textures = {}
-    self.model.anims = iqm.load_anims('assets/models/ball.iqm')
+    self.model.anims = iqm.load_anims('assets/models/skeleton.iqm')
     self.model.anim = anim9(self.model.anims)
     assert(self.model.anim)
 
-    local anim1 = self.model.anim:add_track("spin")
-    anim1.playing = true
-    anim1.lock = true
+    self.anim = 'none'
+    self:stand()
 
     return self
+end
+
+function enemy:walk()
+    if self.anim ~= 'walking' then
+        self.walking = self.model.anim:add_track('walking')
+        self.walking.playing = true
+    end
+
+    if self.anim == 'running' then
+        self.model.anim:remove_track(self.running)
+        self.running.playing = false
+    end
+    self.anim = 'walking'
+end
+
+function enemy:run()
+    if self.anim ~= 'running' then
+        self.running = self.model.anim:add_track('running')
+        self.running.playing = true
+    end
+
+    if self.anim == 'walking' then
+        self.model.anim:remove_track(self.walking)
+        self.walking.playing = false
+    end
+    self.anim = 'running'
+end
+
+function enemy:stand()
+    self:walk()
+    self.walking.playing = false
 end
 
 function enemy:draw()
@@ -151,6 +181,7 @@ function enemy:idle(dt, player)
     end
 
     self.velocity = cpml.vec2(0, 0)
+    self:stand()
 end
 
 function enemy:search(dt, player)
@@ -185,10 +216,8 @@ function enemy:search(dt, player)
     end
 
     local d = self.velocity:normalize()
-    self.rotation = math.asin(d.x)
-    if d.x > 0 then
-        self.rotation = -self.rotation+math.pi
-    end
+    self.rotation = select(2, d:to_polar())-math.pi*1/2
+    self:walk()
 end
 
 function enemy:attack(dt, player)
@@ -203,8 +232,9 @@ function enemy:attack(dt, player)
     elseif distance > 6.25 then
         self.velocity = d*2 -- XXX GET HIM!
 
-        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*1/2
         self.attacking = player
+        self:run()
     else
         if not self.sword and self.attack_timer > 3 then
             self.sword = sword.new(self)
@@ -212,7 +242,8 @@ function enemy:attack(dt, player)
         end
 
         self.velocity = cpml.vec2(0, 0)
-        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*1/2
+        self:stand()
     end
 
     if self.health < self.health_max*0.25 then
@@ -233,6 +264,8 @@ function enemy:flee(dt, player)
 
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
     end
+
+    self:run()
 end
 
 function enemy:dir()
