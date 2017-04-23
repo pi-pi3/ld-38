@@ -54,6 +54,7 @@ function player.new(x, y, z)
     self.agility = 5
     self.defense = 5
     self.max_vel = 6
+    self.range2 = 60
 
     self.attack_timer = attack_delay
     self.attacking = false
@@ -91,7 +92,7 @@ function player:update(dt)
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
 
         local min_dist = 1
-        if self.attacking then min_dist = 6.25 end
+        if self.attacking then min_dist = self.range2 end
 
         if dir:len2() < min_dist then
             self.dest = nil
