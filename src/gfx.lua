@@ -139,8 +139,10 @@ function gfx.draw(model)
     end
 
     for _, buffer in ipairs(model) do
-        local texture = model.textures[buffer.material]
-        model.mesh:setTexture(texture)
+        if model.textures then
+            local texture = model.textures[buffer.material]
+            model.mesh:setTexture(texture)
+        end
         model.mesh:setDrawRange(buffer.first, buffer.last)
         love.graphics.draw(model.mesh)
     end

@@ -35,21 +35,21 @@ local time = 8.0
 local max_vel = 10.0 -- Gotta go fast
 
 function fireball.new(owner, mult)
-    local self = entity.new(0, 0, 0, 'fireball.iqm', {'fireball.tga'}, nil)
+    local self = entity.new(owner.position.x, owner.position.y, owner.position.z+1,
+                            'fireball.iqm', {'fireball.tga'}, nil)
     setmetatable(self, mt)
 
     self.t = 'fireball'
     self.health = 1
 
     local rot = owner.rotation
-    self.position = util.copy(owner.position)
     self.velocity = cpml.vec2(math.sin(rot)*max_vel, -math.cos(rot)*max_vel)
     self.rotation = rot
 
     -- Big things hit hard, right?
     local scale = owner.scale.x * owner.scale.y * owner.scale.z
     local scale2 = owner.scale.x * owner.scale.y
-    self.radius2 = scale2*scale2*6.25
+    self.radius2 = scale2*scale2*4
 
     self.owner = owner
     -- high power, low agility means your damage is going to vary (A LOT)

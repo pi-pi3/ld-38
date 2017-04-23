@@ -50,7 +50,7 @@ local attack_delay = 2
 ]]
 
 function enemy.new(x, y, z)
-    local self = entity.new(x, y, z, 'skeleton.iqm', nil, {'walking', 'running'})
+    local self = entity.new(x, y, z, 'skeleton.iqm', nil, 'walking')
     setmetatable(self, mt)
 
     self.t = 'enemy'
@@ -67,7 +67,7 @@ function enemy.new(x, y, z)
                       rot = 0,
                       dst = {}}
 
-    self.anim = 'none'
+    self.animation = 'none'
     self:stand()
 
     return self
@@ -90,29 +90,29 @@ function enemy:update(dt)
 end
 
 function enemy:walk()
-    if self.anim ~= 'walking' then
+    if self.animation ~= 'walking' then
         self.walking = self.model.anim:add_track('walking')
         self.walking.playing = true
     end
 
-    if self.anim == 'running' then
+    if self.animation == 'running' then
         self.model.anim:remove_track(self.running)
         self.running.playing = false
     end
-    self.anim = 'walking'
+    self.animation = 'walking'
 end
 
 function enemy:run()
-    if self.anim ~= 'running' then
+    if self.animation ~= 'running' then
         self.running = self.model.anim:add_track('running')
         self.running.playing = true
     end
 
-    if self.anim == 'walking' then
+    if self.animation == 'walking' then
         self.model.anim:remove_track(self.walking)
         self.walking.playing = false
     end
-    self.anim = 'running'
+    self.animation = 'running'
 end
 
 function enemy:stand()

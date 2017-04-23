@@ -100,16 +100,6 @@ function game.draw()
     game.world:draw()
 end
 
-function game.keypressed(key, scancode, isrepeat)
-    game.world:keypressed(scancode)
-
-    if scancode == 'r' then
-        game.camera.pos.z = game.camera.pos.z + 0.1
-    elseif scancode == 'f' then
-        game.camera.pos.z = game.camera.pos.z - 0.1
-    end
-end
-
 function game.mousepressed(mx, my, button)
     if button == 1 then
         local p = gfx.unproject(mx, my, math.rad(fov), near, far,
@@ -128,8 +118,6 @@ function game.mousepressed(mx, my, button)
 end
 
 function game.mousemoved(mx, my, dx, dy)
-    game.world:mousemoved(mx, my, dx, dy)
-
     if love.mouse.isDown(1) and game.world.entities.player.dest then
         -- TODO: rotate player
         local p = gfx.unproject(mx, my, math.rad(fov), near, far,

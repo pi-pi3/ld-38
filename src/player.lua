@@ -37,13 +37,13 @@ local acc = 150
 local decc = 600
 local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
-local attack_delay = 2
+local attack_delay = 1
 
 function player.new(x, y, z)
     local self = entity.new(x, y, z, 'roman.iqm', 
                             {'djinni_body.tga', 'djinni_belt.tga', 
                              'djinni_eye.tga', 'djinni_tail.tga'},
-                            {'walking'})
+                            'walking')
     setmetatable(self, mt)
 
     self.t = 'player'
@@ -75,6 +75,7 @@ function player:update(dt)
         self.attack_timer = 0
     end
 
+    local vx, vy = self.velocity.x, self.velocity.y 
     -- Goto dest
     if self.dest then
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
@@ -84,19 +85,20 @@ function player:update(dt)
 
         if dir:len2() < min_dist then
             self.dest = nil
+            vx, vy = 0, 0
+        else
+            dir = dir:normalize()
+            vx = util.clamp(vx + dir.x*acc*dt, -max_vel, max_vel)
+            vy = util.clamp(vy + dir.y*acc*dt, -max_vel, max_vel)
         end
-
-        self.rotation = select(2, dir:to_polar())-math.pi*3/2
-        vx = util.clamp(vx - dir.x*acc*dt, -max_vel, max_vel)
-        vy = util.clamp(vy - dir.y*acc*dt, -max_vel, max_vel)
     end
 
     self.velocity.x, self.velocity.y = vx, vy
 
     -- Camera position
     game.state.camera.pos.x, game.state.camera.pos.y = 
-            game.state.camera.pos.x + vx*c - vy*s,
-            game.state.camera.pos.y + vy*c + vx*s
+            game.state.camera.pos.x + self.velocity.x*dt,
+            game.state.camera.pos.y + self.velocity.y*dt
 
     entity.update(self, dt)
 

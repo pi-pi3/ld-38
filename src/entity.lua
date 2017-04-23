@@ -26,8 +26,6 @@ local util = require('util')
 local iqm = require('iqm')
 local cpml = require('cpml')
 local anim9 = require('anim9')
-local fireball = require('fireball')
-local sword = require('sword')
 
 local entity = {}
 local mt = {__index = entity}
@@ -38,7 +36,7 @@ local decc = 600
 local max_vel = 6
 local attack_delay = 2
 
-function entity.new(x, y, z, model, textures, anims)
+function entity.new(x, y, z, model, textures, anim)
     local self = {}
     setmetatable(self, mt)
 
@@ -60,23 +58,14 @@ function entity.new(x, y, z, model, textures, anims)
     self.attack_timer = attack_delay
     self.attacking = false
 
-    self.model = {}
-    self.model.textures = {}
-    self.model.anims = {}
-    self.model.anim = {}
-    self.anims = {}
+    self.anim = false
 
     if model then
         self.model = iqm.load('assets/models/' .. model)
         assert(self.model)
 
-        self.model.anims = iqm.load_anims('assets/models/' .. model)
-        assert(self.model.anims)
-
-        self.model.anim = anim9(self.model.anims)
-        assert(self.model.anim)
-
         if textures then
+            self.model.textures = {}
             for _, t in pairs(textures) do
                 self.model.textures[t] =
                     love.graphics.newImage('assets/textures/' .. t, {mipmaps = true})
@@ -86,17 +75,15 @@ function entity.new(x, y, z, model, textures, anims)
             end
         end
 
-        if anims then
-            local first_set = false
-            for _, a in pairs(anims) do
-                self.anims[a] = self.model.anim:add_track(a)
-                assert(self.anims[a])
+        if anim then
+            self.model.anims = iqm.load_anims('assets/models/' .. model)
+            assert(self.model.anims)
 
-                if not first_set then
-                    self.anims[a].playing = true
-                    first_set = true
-                end
-            end
+            self.model.anim = anim9(self.model.anims)
+            assert(self.model.anim)
+
+            self.anim = self.model.anim:add_track(anim)
+            self.anim.playing = true
         end
     end
 
@@ -104,7 +91,11 @@ function entity.new(x, y, z, model, textures, anims)
 end
 
 function entity:draw()
-    if #self.anims > 0 then
+    if not self.model then
+        return
+    end
+
+    if self.anim then
         gfx.set_shader(shader_anim)
     else
         gfx.set_shader(shader_static)
@@ -125,7 +116,7 @@ function entity:update(dt)
         game.state.world:remove(self)
     end
 
-    if #self.anims > 0 then
+    if self.anim then
         self.model.anim:update(dt)
     end
 
@@ -138,14 +129,10 @@ function entity:update(dt)
         self.velocity.y = self.velocity.y + self.force.y*dt
     end
 
-    local c, s = math.cos(self.rotation), math.sin(self.rotation)
-    local vx = self.velocity.x*dt
-    local vy = self.velocity.y*dt
-
     -- Update position
     self.position.x, self.position.y = 
-            self.position.x + vx*c - vy*s,
-            self.position.y + vy*c + vx*s
+            self.position.x + self.velocity.x*dt,
+            self.position.y + self.velocity.y*dt
 end
 
 function entity:moveto(x, y)
@@ -162,7 +149,6 @@ end
 function entity:attack(enemy)
     self.attacking = enemy
 end
-
 
 function entity:dir()
     return cpml.vec2(math.sin(self.rotation), -math.cos(self.rotation))

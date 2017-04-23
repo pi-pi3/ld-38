@@ -82,15 +82,8 @@ function world:draw()
     end
 end
 
-function world:keypressed(key)
-    self.entities.player:keypressed(key)
-end
-
 function world:mousepressed(mx, my, button)
     self.entities.player:mousepressed(mx, my, button)
-end
-
-function world:mousemoved(mx, my, dx, dy)
 end
 
 function world:nearest(pos, incl_player)
