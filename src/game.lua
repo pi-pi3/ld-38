@@ -56,7 +56,7 @@ function game.load()
 
     local w, h = 8, 8
     game.world = world.gen(w, h)
-    game.camera = {pos = cpml.vec3(0, 6, 10),
+    game.camera = {pos = cpml.vec3(0, 8, 12),
                    rot = cpml.vec3(theta, 0, 0),
                    proj = gfx.projection(fov, width/height, near, far)}
 
