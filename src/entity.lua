@@ -30,12 +30,6 @@ local anim9 = require('anim9')
 local entity = {}
 local mt = {__index = entity}
 
--- TODO: some of these might have to be per-entity, not per-type
-local acc = 150
-local decc = 600
-local max_vel = 6
-local attack_delay = 2
-
 function entity.new(x, y, z, model, textures, anim)
     local self = {}
     setmetatable(self, mt)
@@ -54,9 +48,11 @@ function entity.new(x, y, z, model, textures, anim)
     self.agility = 1
     self.defense = 1
 
+    self.max_vel = 1
     self.timer = 0
-    self.attack_timer = attack_delay
+    self.attack_timer = 0
     self.attacking = false
+    self.weight = 2000.0
 
     self.anim = false
 
@@ -127,6 +123,17 @@ function entity:update(dt)
     if self.force then
         self.velocity.x = self.velocity.x + self.force.x*dt
         self.velocity.y = self.velocity.y + self.force.y*dt
+
+        local fx = self.force.x
+        local fy = self.force.y
+
+        self.force.x = self.force.x + self.anti_force.x*self.weight*dt
+        self.force.y = self.force.y + self.anti_force.y*self.weight*dt
+
+        if util.sign(self.force.x) ~= util.sign(fx)
+            or util.sign(self.force.y) ~= util.sign(fy) then
+            self.force = nil
+        end
     end
 
     -- Update position
@@ -157,6 +164,9 @@ end
 function entity:pushback(v)
     self.velocity = cpml.vec2(0, 0)
     self.force = v
+
+    local t = 1000/self.weight
+    self.anti_force = -self.force/(1000*t)
 end
 
 return entity

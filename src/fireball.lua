@@ -32,7 +32,6 @@ setmetatable(fireball, {__index = entity})
 local mt = {__index = fireball}
 
 local time = 8.0
-local max_vel = 10.0 -- Gotta go fast
 
 function fireball.new(owner, mult)
     local self = entity.new(owner.position.x, owner.position.y, owner.position.z+1,
@@ -43,8 +42,10 @@ function fireball.new(owner, mult)
     self.health = 1
 
     local rot = owner.rotation
-    self.velocity = cpml.vec2(math.sin(rot)*max_vel, -math.cos(rot)*max_vel)
     self.rotation = rot
+
+    self.max_vel = 10.0
+    self.velocity = cpml.vec2(math.sin(rot)*self.max_vel, -math.cos(rot)*self.max_vel)
 
     -- Big things hit hard, right?
     local scale = owner.scale.x * owner.scale.y * owner.scale.z
@@ -67,7 +68,7 @@ function fireball.new(owner, mult)
     self.pushback_power = math.random() > (owner.power/100*scale)
 
     if self.pushback_power then
-        self.pushback_power = owner.power*scale
+        self.pushback_power = owner.power*scale*1000
     end
 
     return self

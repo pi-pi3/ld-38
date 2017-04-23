@@ -35,7 +35,6 @@ local mt = {__index = player}
 
 local acc = 150
 local decc = 600
-local max_vel = 6
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
 local attack_delay = 1
 
@@ -50,10 +49,11 @@ function player.new(x, y, z)
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = 5
-    self.power = 5
+    self.strength = 8
+    self.power = 20
     self.agility = 5
     self.defense = 5
+    self.max_vel = 6
 
     self.attack_timer = attack_delay
 
@@ -88,8 +88,8 @@ function player:update(dt)
             vx, vy = 0, 0
         else
             dir = dir:normalize()
-            vx = util.clamp(vx + dir.x*acc*dt, -max_vel, max_vel)
-            vy = util.clamp(vy + dir.y*acc*dt, -max_vel, max_vel)
+            vx = util.clamp(vx + dir.x*acc*dt, -self.max_vel, self.max_vel)
+            vy = util.clamp(vy + dir.y*acc*dt, -self.max_vel, self.max_vel)
         end
     end
 

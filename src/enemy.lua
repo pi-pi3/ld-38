@@ -33,7 +33,6 @@ local enemy = {}
 setmetatable(enemy, {__index = entity})
 local mt = {__index = enemy}
 
-local max_vel = 2.5
 local attack_delay = 2
 
 --[[ AI (simplified)
@@ -57,10 +56,11 @@ function enemy.new(x, y, z)
 
     self.health = 12
     self.health_max = 12
-    self.strength = 2
-    self.power = 2
+    self.strength = 5
+    self.power = 10
     self.agility = 3
     self.defense = 1
+    self.max_vel = 2.5
 
     self.state = 'idle'
     self.searching = {timer = 0,
