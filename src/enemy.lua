@@ -23,9 +23,7 @@
 ]]
 
 local util = require('util')
-local iqm = require('iqm')
 local cpml = require('cpml')
-local anim9 = require('anim9')
 local sword = require('sword')
 local entity = require('entity')
 
@@ -166,7 +164,7 @@ function enemy:search(dt, player)
     end
 
     local d = self.velocity:normalize()
-    self.rotation = select(2, d:to_polar())-math.pi*1/2
+    self.rotation = select(2, d:to_polar())+math.pi*0.5
     self:walk()
 end
 
@@ -182,7 +180,7 @@ function enemy:attack(dt, player)
     elseif distance > 6.25 then
         self.velocity = d*2 -- XXX GET HIM!
 
-        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*1/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*0.5
         self.attacking = player
         self:run()
     else
@@ -192,7 +190,7 @@ function enemy:attack(dt, player)
         end
 
         self.velocity = cpml.vec2(0, 0)
-        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*1/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*0.5
         self:stand()
     end
 
@@ -212,7 +210,7 @@ function enemy:flee(dt, player)
     else
         self.velocity = -d:normalize()*2 -- XXX RUN AWAY!
 
-        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())-math.pi*3/2
+        self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*1.5
     end
 
     self:run()
