@@ -87,7 +87,7 @@ local function init(i)
         return true
     elseif i == 2 then
         text('I\'m bored.', 'djinni')
-        sound('intro1.ogg')
+        sound('bored.ogg')
         return true
     elseif i == 3 then
         screenshake()
@@ -133,7 +133,7 @@ local function init(i)
              'simoultaneously and it slows them down.', 'djinni')
         return true
     elseif i == 16 then
-        sound('intro2.ogg')
+        sound('come_catch_me.ogg')
     end
 
     return false
