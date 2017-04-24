@@ -31,7 +31,7 @@ local fireball = {}
 setmetatable(fireball, {__index = entity})
 local mt = {__index = fireball}
 
-local time = 8.0
+local time = 1.0
 
 function fireball.new(owner, mult)
     local self = entity.new(owner.position.x, owner.position.y, owner.position.z+1,
@@ -41,11 +41,12 @@ function fireball.new(owner, mult)
     self.t = 'fireball'
     self.health = 1
     self.gravity = false
+    self.life = time
 
     local rot = owner.rotation
     self.rotation = rot
 
-    self.max_vel = 10.0
+    self.max_vel = 25.0
     self.velocity = cpml.vec2(math.sin(rot)*self.max_vel, -math.cos(rot)*self.max_vel)
 
     -- Big things hit hard, right?
@@ -76,11 +77,6 @@ function fireball.new(owner, mult)
 end
 
 function fireball:update(dt)
-    if self.timer > time then
-        game.state.world:remove(self)
-        return
-    end
-
     local world = game.state.world
 
     for _, e in pairs(world.entities) do

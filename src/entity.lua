@@ -121,7 +121,7 @@ function entity:update(dt)
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
     if self.life then 
-        self.life = self.time - dt
+        self.life = self.life - dt
         if self.life < 0 then
             self:die()
         end
