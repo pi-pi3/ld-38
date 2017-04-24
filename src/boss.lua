@@ -41,6 +41,7 @@ function boss.new(x, y, z)
     self.t = 'boss'
 
     self.scale = cpml.vec3(2, 2, 2)
+    self.gravity = false
 
     self.health = 6666 -- The answer to life, the universe and everything.
     self.health_max = 6666
