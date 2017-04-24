@@ -24,7 +24,6 @@
 
 local util = require('util')
 local cpml = require('cpml')
-local fireball = require('fireball')
 local entity = require('entity')
 local rect = require('rect')
 
@@ -35,6 +34,7 @@ local mt = {__index = player}
 local acc = 150
 local decc = 600
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
+-- TODO: attack_delay per spell
 local attack_delay = 1
 
 function player.new(x, y, z)
@@ -48,7 +48,7 @@ function player.new(x, y, z)
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = 8
+    self.strength = 6
     self.power = 20
     self.agility = 5
     self.defense = 5
@@ -58,6 +58,7 @@ function player.new(x, y, z)
     self.attack_timer = attack_delay
     self.attacking = false
     self.shooting = 0
+    self.spell = require('fireball')
 
     return self
 end
@@ -75,7 +76,7 @@ function player:update(dt)
         if self.attack_timer > attack_delay
             and cpml.vec2.dist2(self.attacking.position, self.position)
                 < self.range2 then
-            game.state.world:insert(fireball.new(self))
+            game.state.world:insert(self.spell.new(self))
             self.attack_timer = 0
         end
 
@@ -97,8 +98,8 @@ function player:update(dt)
             vx, vy = 0, 0
         else
             dir = dir:normalize()
-            vx = util.clamp(vx + dir.x*acc*dt, -self.max_vel, self.max_vel)
-            vy = util.clamp(vy + dir.y*acc*dt, -self.max_vel, self.max_vel)
+            vx = util.clamp(vx + dir.x*acc*dt, -self:stat('max_vel'), self.max_vel)
+            vy = util.clamp(vy + dir.y*acc*dt, -self:stat('max_vel'), self.max_vel)
         end
     end
 
@@ -115,7 +116,7 @@ end
 function player:mousepressed(mx, my, button)
     if button == 2 then
         if self.attack_timer > attack_delay then
-            game.state.world:insert(fireball.new(self))
+            game.state.world:insert(self.spell.new(self))
             self.attack_timer = 0
         end
     end

@@ -62,6 +62,7 @@ function enemy.new(x, y, z)
     self.defense = 1
     self.max_vel = 2.5
 
+    self.follow = false
     self.state = 'idle'
     self.searching = {timer = 0,
                       rot = 0,
@@ -169,7 +170,7 @@ function enemy:search(dt, player)
     local d = player.position - self.position
     local distance = cpml.vec3.len2(d)
 
-    if distance > 64.0 then
+    if distance > 64.0 and not self.follow then
         self.state = 'idle' -- XXX Must've been the wind.
         self.velocity = cpml.vec3(0, 0)
     elseif distance < 16.0 then
@@ -189,13 +190,13 @@ function enemy:search(dt, player)
 
         rot = rot + self.searching.rot
 
-        self.velocity = cpml.vec3(math.sin(rot), -math.cos(rot))*self.max_vel
+        self.velocity = cpml.vec3(math.sin(rot), -math.cos(rot))*self:stat('max_vel')
 
         self.rotation = rot
         self:walk()
     end
 
-    if self.health < self.health_max*0.25 then
+    if self:stat('health') < self.health_max*0.25 then
         self.state = 'fleeing'
     end
 end
@@ -205,12 +206,12 @@ function enemy:attack(dt, player)
     local distance = cpml.vec3.len2(d)
     d = d:normalize()
 
-    if distance > 64.0 then
+    if distance > 64.0 and not self.follow then
         self.state = 'idle' -- XXX He's too far, let's forget he exists.
         self.velocity = cpml.vec3(0, 0)
         self.attacking = false
     elseif distance > 6.25 then
-        self.velocity = d*self.max_vel*2 -- XXX GET HIM!
+        self.velocity = d*self:stat('max_vel')*2 -- XXX GET HIM!
 
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*0.5
         self.attacking = player
@@ -228,7 +229,7 @@ function enemy:attack(dt, player)
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*0.5
     end
 
-    if self.health < self.health_max*0.25 then
+    if self:stat('health') < self.health_max*0.25 then
         self.state = 'fleeing'
         self.attacking = false
     end
@@ -238,16 +239,25 @@ function enemy:flee(dt, player)
     local d = player.position - self.position
     local distance = cpml.vec3.len2(d)
 
-    if distance > 64.0 then
+    if distance > 64.0 and not self.follow then
         self.state = 'idle' -- XXX He's too far, let's forget he exists
         self.velocity = cpml.vec3(0, 0)
     else
-        self.velocity = -d:normalize()*self.max_vel*2 -- XXX RUN AWAY!
+        self.velocity = -d:normalize()*self:stat('max_vel')*2 -- XXX RUN AWAY!
 
         self.rotation = select(2, cpml.vec2(d.x, d.y):to_polar())+math.pi*1.5
     end
 
     self:run()
+end
+
+function enemy:on_damage(owner, dmg)
+    if dmg < self:stat('health_max') * 0.5 then
+        self.attacking = owner
+        self.follow = true
+    else
+        self.stagger = 2
+    end
 end
 
 return enemy

@@ -33,12 +33,15 @@ local mt = {__index = fireball}
 
 local time = 1.0
 
-function fireball.new(owner, mult)
+function fireball.new(owner, mult, model, textures)
+    model = model or 'fireball.iqm'
+    textures = textures or {'fireball.tga'}
+
     local self = entity.new(owner.position.x, owner.position.y, owner.position.z+1,
-                            'fireball.iqm', {'fireball.tga'}, nil)
+                            model, textures, nil)
     setmetatable(self, mt)
 
-    self.t = 'fireball'
+    self.t = 'spell.fireball'
     self.health = 1
     self.gravity = false
     self.life = time
@@ -47,7 +50,7 @@ function fireball.new(owner, mult)
     self.rotation = rot
 
     self.max_vel = 25.0
-    self.velocity = cpml.vec2(math.sin(rot)*self.max_vel, -math.cos(rot)*self.max_vel)
+    self.velocity = cpml.vec2(math.sin(rot)*self:stat('max_vel'), -math.cos(rot)*self.max_vel)
 
     -- Big things hit hard, right?
     local scale = owner.scale.x * owner.scale.y * owner.scale.z
@@ -75,6 +78,7 @@ function fireball.new(owner, mult)
 
     self.hits = 2
     self.hit_hash = {}
+    self.dmg_falloff = 0.75
 
     return self
 end
@@ -87,7 +91,10 @@ function fireball:update(dt)
             if self:collision(e) then
                 self:hit(e)
                 self.hits = self.hits - 1
-                self.dmg = self.dmg*0.75
+                self.dmg = self.dmg*self.dmg_falloff
+                if self.pushback_power then
+                    self.pushback_power = self.pushback_power*self.dmg_falloff
+                end
                 return
             end
         end
@@ -105,6 +112,10 @@ function fireball:collision(e)
         return false
     end
 
+    if util.startswith(e.t, 'spell') then
+        return false
+    end
+
     local d = e.position - self.position
     d = cpml.vec2(d.x, d.y)
 
@@ -112,11 +123,15 @@ function fireball:collision(e)
 end
 
 function fireball:hit(e)
-    e.health = e.health - (self.dmg - e.defense)
+    e:damage(self.owner, self.dmg - e.defense)
+
     self.hit_hash[e] = true
+    if self.effect then
+        e:add_effect(self.effect)
+    end
+
     if self.pushback_power then
-        local d = e.position - self.owner.position
-        e:pushback(d:normalize()*self.pushback_power)
+        e:pushback(self.velocity:normalize()*self.pushback_power)
     end
 end
 

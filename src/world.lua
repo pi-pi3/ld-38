@@ -333,10 +333,11 @@ end
 
 function world:insert(e, n)
     if n then
-        for i = 1, n do
-            world:insert(e[i])
+        for i = 1, math.min(n, #e) do
+            self:insert(e[i])
         end
     else
+        assert(e.t)
         table.insert(self.entities, e)
     end
 end
