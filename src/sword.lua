@@ -24,93 +24,50 @@
 
 local cpml = require('cpml')
 local iqm = require('iqm')
+local fireball = require('fireball')
+local anim9 = require('anim9')
 
 local sword = {}
+setmetatable(sword, {__index = fireball})
 local mt = {__index = sword}
 
-local time = 0.75
+local time = 16/30
 
-function sword.new(owner, mult)
-    local self = {}
+function sword.new(owner, mult, model, textures)
+    model = model or 'sword.iqm'
+    textures = textures or {'sword.tga'}
+
+    local self = fireball.new(owner, mult, model, textures)
     setmetatable(self, mt)
 
-    self.t = 'sword'
-    self.health = 1
-    self.rotation = 0
+    self.t = 'spell.sword'
+    self.life = time
 
-    -- Big things hit hard, right?
-    local scale = owner.scale.x * owner.scale.y * owner.scale.z
-    local scale2 = owner.scale.x * owner.scale.y
-    self.radius2 = scale2*scale2*6.25
+    self.rotation = owner.rotation
 
-    self.owner = owner
-    -- high power, low agility means your damage is going to vary (A LOT)
-    -- low power, high agility means your damage is going to be rel. constant
-    -- BUT high power also means high pushback
-    --     high agility means high critical damage
-    self.critical = math.random() > owner.agility/100
-    self.dmg = math.random(owner.strength-owner.power*scale/owner.agility,
-                           owner.strength-owner.power*scale/owner.agility)
-               * (mult or 1)
-               * (self.critical and 3 or 1)
-               * scale
-    self.dmg = math.floor(self.dmg)
+    self.max_vel = 0.0
+    self.velocity = cpml.vec2(0, 0)
 
-    self.pushback = math.random() > (owner.power/100*scale)
+    self.hits = 256
+    self.dmg_falloff = 0.8
 
-    if self.pushback then
-        self.pushback = owner.power*scale
-    end
+    self.model.anims = iqm.load_anims('assets/models/' .. model)
+    assert(self.model.anims)
 
-    self.timer = 0
+    self.model.anim = anim9(self.model.anims)
+    assert(self.model.anim)
 
-    if not sword.model then
-        sword.model = iqm.load('assets/models/sword.iqm')
-        sword.model.textures = {}
+    self.anim = self.model.anim:add_track('slashing')
+    self.anim.playing = true
 
-        sword.model.textures.sword =
-            love.graphics.newImage('assets/textures/sword.tga', {mipmaps = true})
-        sword.model.textures.sword:setFilter('nearest', 'linear')
-    end
+    self.model.anim:update(0)
 
     return self
 end
 
-function sword:draw()
-    gfx.set_shader(shader_static)
-
-    gfx.push()
-
-    gfx.transform(self.owner.position+cpml.vec3(0, 0, 1.5),
-                  cpml.vec3(0, 0, self.owner.rotation+self.rotation),
-                  self.owner.scale)
-    gfx.draw(sword.model)
-
-    gfx.pop()
-end
-
 function sword:update(dt)
-    if self.timer > time then
-        self.health = 0
-    end
-
-    self.timer = self.timer + dt
-    self.rotation = math.sin(self.timer*(math.pi/time)*0.5)
-
-    if self.timer > math.pi*0.5 then
-        self.health = 0
-    end
-
-    local world = game.state.world
-
-    for _, e in pairs(world.entities) do
-        if e ~= self.owner then
-            if self:collision(e) then
-                self:hit(e)
-                self.health = 0
-            end
-        end
-    end
+    fireball.update(self, dt)
+    self.position = self.owner.position
 end
 
 function sword:collision(e)
@@ -123,18 +80,6 @@ function sword:collision(e)
 
         return math.abs(theta-self.rotation) < math.pi*0.0625
     end
-end
-
-function sword:hit(e)
-    e.health = e.health - (self.dmg - e.defense)
-    if self.pushback then
-        local d = e.position - self.owner.position
-        e:pushback(d:normalize()*self.pushback)
-    end
-end
-
-function sword:alive()
-    return self.health > 0
 end
 
 return sword

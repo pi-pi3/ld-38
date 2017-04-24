@@ -35,7 +35,7 @@ declare = util.declare -- global alias for declare, should work in every file
 
 function love.load()
     math.randomseed(os.time()) -- don't forget your randomseed!
-    love.keyboard.setKeyRepeat(true)
+    love.keyboard.setKeyRepeat(false)
 
     -- this is called in love.load, because some external libraries might
     -- require global variables

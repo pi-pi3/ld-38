@@ -24,7 +24,6 @@
 
 local util = require('util')
 local cpml = require('cpml')
-local fireball = require('fireball')
 local entity = require('entity')
 local rect = require('rect')
 
@@ -35,20 +34,19 @@ local mt = {__index = player}
 local acc = 150
 local decc = 600
 local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
+-- TODO: attack_delay per spell
 local attack_delay = 1
 
 function player.new(x, y, z)
-    local self = entity.new(x, y, z, 'roman.iqm', 
-                            {'djinni_body.tga', 'djinni_belt.tga', 
-                             'djinni_eye.tga', 'djinni_tail.tga'},
-                            'walking', rect.new(0, 0, 1, 1))
+    local self = entity.new(x, y, z, 'djinni.iqm', {'djinni.tga'},
+                            'idle', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'player'
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = 8
+    self.strength = 6
     self.power = 20
     self.agility = 5
     self.defense = 5
@@ -58,6 +56,7 @@ function player.new(x, y, z)
     self.attack_timer = attack_delay
     self.attacking = false
     self.shooting = 0
+    self.spell = require('fireball')
 
     return self
 end
@@ -75,7 +74,7 @@ function player:update(dt)
         if self.attack_timer > attack_delay
             and cpml.vec2.dist2(self.attacking.position, self.position)
                 < self.range2 then
-            game.state.world:insert(fireball.new(self))
+            game.state.world:insert(self.spell.new(self))
             self.attack_timer = 0
         end
 
@@ -95,10 +94,18 @@ function player:update(dt)
 
         if dir:len2() < min_dist then
             vx, vy = 0, 0
+            if self.walking then
+                self.model.anim:remove_track(self.walking)
+                self.walking = nil
+            end
+            if not self.idle then
+                self.idle = self.model.anim:add_track('idle')
+                self.idle.playing = true
+            end
         else
             dir = dir:normalize()
-            vx = util.clamp(vx + dir.x*acc*dt, -self.max_vel, self.max_vel)
-            vy = util.clamp(vy + dir.y*acc*dt, -self.max_vel, self.max_vel)
+            vx = util.clamp(vx + dir.x*acc*dt, -self:stat('max_vel'), self.max_vel)
+            vy = util.clamp(vy + dir.y*acc*dt, -self:stat('max_vel'), self.max_vel)
         end
     end
 
@@ -115,7 +122,7 @@ end
 function player:mousepressed(mx, my, button)
     if button == 2 then
         if self.attack_timer > attack_delay then
-            game.state.world:insert(fireball.new(self))
+            game.state.world:insert(self.spell.new(self))
             self.attack_timer = 0
         end
     end
@@ -130,6 +137,15 @@ function player:moveto(x, y)
     end
 
     self.dest = pos
+    if self.idle then
+        self.model.anim:remove_track(self.idle)
+        self.idle = nil
+    end
+    if not self.walking then
+        self.walking = self.model.anim:add_track('walking')
+        self.walking.playing = true
+    end
+
     if self.shooting <= 0 then
         self:lookat(pos)
     end

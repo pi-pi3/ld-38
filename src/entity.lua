@@ -50,11 +50,14 @@ function entity.new(x, y, z, model, textures, anim, bbox)
     self.agility = 1
     self.defense = 1
 
+    self.effects = {}
+
     self.max_vel = 1
     self.timer = 0
     self.attack_timer = 0
     self.attacking = false
     self.weight = 2000.0
+    self.stagger = 0
 
     self.anim = false
 
@@ -125,7 +128,15 @@ function entity:update(dt)
     if self.life then 
         self.life = self.life - dt
         if self.life < 0 then
+            self.dying = false
             self:die()
+        end
+    end
+
+    for k, eff in pairs(self.effects) do
+        eff.life = eff.life - dt
+        if eff.life <= 0 then
+            self:remove_effect(eff, k)
         end
     end
 
@@ -137,8 +148,8 @@ function entity:update(dt)
         local fx = self.force.x
         local fy = self.force.y
 
-        self.force.x = self.force.x + self.anti_force.x*self.weight*dt
-        self.force.y = self.force.y + self.anti_force.y*self.weight*dt
+        self.force.x = self.force.x + self.anti_force.x*self:stat('weight')*dt
+        self.force.y = self.force.y + self.anti_force.y*self:stat('weight')*dt
 
         if util.sign(self.force.x) ~= util.sign(fx)
             or util.sign(self.force.y) ~= util.sign(fy) then
@@ -202,17 +213,23 @@ function entity:pushback(v)
     self.velocity = cpml.vec3(0, 0, 0)
     self.force = v
 
-    local t = 1000/self.weight
+    local t = 1000/self:stat('weight')
     self.anti_force = -self.force/(1000*t)
 end
 
 function entity:alive()
-    return self.health > 0
+    return self:stat('health') > 0
 end
 
-function entity:die()
-    self.health = -1
-    game.state.world:remove(self)
+function entity:die(t)
+    if t then
+        self.life = t
+    elseif self.dying and not self.life then
+        self.life = self.dying
+    else
+        self.health = -1
+        game.state.world:remove(self)
+    end
 end
 
 function entity:on_ground()
@@ -236,6 +253,50 @@ function entity:on_ground()
                    or p_on_ground(px, py, self.bbox.w, self.bbox.h)
 
     return on_ground
+end
+
+function entity:stat(stat)
+    local val = self[stat]
+    
+    for _, eff in pairs(self.effects) do
+        if eff.t == 'effect.passive'
+            and eff.stat_mod[stat] then
+            val = val * eff.stat_mod[stat]
+        end
+    end
+
+    return val
+end
+
+function entity:add_effect(eff)
+    table.insert(self.effects, eff)
+end
+
+function entity:remove_effect(eff, key)
+    if key then
+        if type(key) == 'number' then
+            table.remove(self.effects, key)
+        else
+            self.effects[key] = nil
+        end
+    else
+        for k, eff1 in pairs(self.effects) do
+            if eff == eff1 then
+                if type(k) == 'number' then
+                    table.remove(self.effects, k)
+                else
+                    self.effects[k] = nil
+                end
+            end
+        end
+    end
+end
+
+function entity:damage(owner, dmg)
+    self.health = self.health - dmg
+    if self.on_damage then
+        self:on_damage(owner, dmg)
+    end
 end
 
 return entity
