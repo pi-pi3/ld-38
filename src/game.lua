@@ -38,7 +38,7 @@ local theta = 2.6
 
 function game.load()
     local background = love.audio.newSource('assets/sounds/background.ogg')
-    background:setLooping(false)
+    background:setLooping(true)
     background:play()
 
     l3d.set_culling(false)
