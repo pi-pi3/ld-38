@@ -69,9 +69,11 @@ function game.load()
         Materialskybox = skybox
     }
 
-    game.intro = 1
+    game.intro = 2
     game.speech = {text = nil, pos = nil}
     game.screenshake = false
+
+    intro(1)
 end
 
 function game.update(dt)
@@ -98,20 +100,37 @@ function game.draw()
     gfx.pop()
     l3d.set_depth_write(true)
 
-    gfx.camera(game.camera.pos, game.camera.rot, nil,
-               game.world.entities.player.position,
-               game.camera.proj)
+    if game.screenshake then
+        local scale = 0.3
+        local off = cpml.vec3((math.random()-0.5)*scale,
+                              (math.random()-0.5)*scale,
+                              (math.random()-0.5)*scale)
+
+        gfx.camera(game.camera.pos + off,
+                   game.camera.rot, nil,
+                   game.world.entities.player.position,
+                   game.camera.proj)
+    else
+        gfx.camera(game.camera.pos, game.camera.rot, nil,
+                   game.world.entities.player.position,
+                   game.camera.proj)
+    end
 
     game.world:draw()
     
     if game.intro then
         l3d.set_depth_write(false)
+        l3d.set_culling()
         gfx.set_shader(nil)
+
+        love.graphics.origin()
+        love.graphics.setBlendMode('alpha')
 
         if game.speech.text then
             love.graphics.setColor(0, 0, 0)
             love.graphics.printf(game.speech.text,
-                                 game.speech.pos.x, game.speech.pos.y)
+                                 game.speech.pos.x, game.speech.pos.y,
+                                 256, 'center')
         end
     end
 end

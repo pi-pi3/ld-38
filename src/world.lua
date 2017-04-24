@@ -276,6 +276,10 @@ function world:update(dt)
         end
     end
 
+    if game.state.intro then
+        return
+    end
+
     if not self:has_entity('enemy') then
         self.stage = self.stage + 1
 
