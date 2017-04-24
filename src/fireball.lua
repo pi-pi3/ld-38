@@ -75,7 +75,7 @@ function fireball.new(owner, mult, model, textures, quiet)
     self.pushback_power = math.random() < (owner.power/100*scale)
 
     if self.pushback_power then
-        self.pushback_power = owner.power*scale*1000
+        self.pushback_power = owner.power*scale*300
     end
 
     self.hits = 2
