@@ -253,6 +253,7 @@ end
 
 function enemy:on_damage(owner, dmg)
     if dmg < self:stat('health_max') * 0.5 then
+        self.state = 'attacking'
         self.attacking = owner
         self.follow = true
     else
