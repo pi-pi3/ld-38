@@ -56,10 +56,10 @@ function enemy.new(x, y, z)
 
     self.health = 12
     self.health_max = 12
-    self.strength = 5
+    self.strength = 6
     self.power = 10
-    self.agility = 3
-    self.defense = 1
+    self.agility = 7
+    self.defense = 2
     self.max_vel = 2.5
 
     self.dying = 30
