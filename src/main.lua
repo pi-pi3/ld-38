@@ -131,6 +131,13 @@ function love.keypressed(key, scancode, isrepeat)
     lgui.keypressed(game.state.elements, key, scancode, isrepeat)
 end
 
+function love.resize(w, h)
+    if not game.state.pause
+        and game.state.resize then
+        game.state.resize(w, h)
+    end
+end
+
 function love.quit()
     if game.state.quit then
         game.state.quit()

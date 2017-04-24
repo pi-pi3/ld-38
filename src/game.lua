@@ -189,4 +189,8 @@ function game.mousemoved(mx, my, dx, dy)
     end
 end
 
+function game.resize(w, h)
+    game.camera.proj = gfx.projection(fov, w/h, near, far)
+end
+
 return game
