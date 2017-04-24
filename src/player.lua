@@ -164,7 +164,7 @@ function player:moveto(x, y)
 end
 
 function player:die()
-    game.state.world.flag_stop = true
+    game.state.load()
 end
 
 return player
