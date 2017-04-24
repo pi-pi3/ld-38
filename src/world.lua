@@ -44,7 +44,7 @@ function world.gen(w, h)
 
     self.world = {{1, 1}, {1, 1}} -- rename this
     self.scale = {x = 2, y = 2}
-    self.offset = {x = -13, y = -13}
+    self.offset = {x = -w-1, y = -h-1}
     self.width = w
     self.height = h
     self.flag_stop = false
@@ -62,16 +62,46 @@ function world:expand(w, h, n, s)
 
     -- Pick a random row, then pick either edge
     local row = math.random(1, self.height)
-    local column = math.random(0, 1) * (self.height - 1) + 1
+    local side = math.random(0, 1)
+    local column = side * (self.height - 1) + 1
+    -- If there's space at that point, find a block
+    local found = false
+
+    for i = row, self.height do
+        if found then break end
+        for j = column, self.width do
+            if self.world[i][j] > 0 then
+                row = i
+                column = j
+                found = true
+                break
+            end
+        end
+    end
 
     local patch = world:genpatch(w, h, n, s)
     -- Anchor
     local i , j = math.random(1, h), math.random(1, w)
 
+    -- If there's space at anchor, find a block
+    local found = false
+    for i1 = row, h do
+        if found then break end
+        for j1 = column, h do
+            if patch[i1][j1] > 0 then
+                i = i1
+                j = j1
+                found = true
+                break
+            end
+        end
+    end
+
     local x0, y0 = w - j - column + 1,
                    h - i - row + 1
     local x1, y1 = w - j - (self.width - column),
                    h - i - (self.height - row)
+
     self.world = self:rebuild(x0, y0, x1, y1)
 
     local off_x, off_y = 0, 0
@@ -85,6 +115,7 @@ function world:expand(w, h, n, s)
 end
 
 function world:attach(patch, off_x, off_y)
+    print(off_x, off_y)
     for i = 1, #patch do
         for j = 1, #patch[i] do
             local old_i = i+off_y
@@ -99,20 +130,29 @@ function world:attach(patch, off_x, off_y)
 end
 
 function world:rebuild(x0, y0, x1, y1)
+    x0, y0 = math.max(x0, 0), math.max(y0, 0)
+    x1, y1 = math.max(x1, 0), math.max(y1, 0)
+
     local w, h = self.width+x1+x0, self.height+y1+y0
 
-    assert(w > self.width)
-    assert(h > self.height)
+    if x0 == 0 and y0 == 0 and x1 == 0 and y1 == 0 then
+        return self.world
+    end
+
+    assert(w > self.width
+        or h > self.height)
 
     self.width, self.height = w, h
+    self.offset.x = self.offset.x - x0*self.scale.x
+    self.offset.y = self.offset.y - y0*self.scale.y
 
     local new = {}
 
     for i = 1, h do
         new[i] = {}
         for j = 1, w do
-            local old_i = i+y0
-            local old_j = j+x0
+            local old_i = i-y0
+            local old_j = j-x0
             new[i][j] = self.world[old_i] and self.world[old_i][old_j] or 0
         end
     end
@@ -246,6 +286,10 @@ end
 
 function world:mousepressed(mx, my, button)
     self.entities.player:mousepressed(mx, my, button)
+
+    if button == 3 then
+        self:expand(12, 12, 144*.8, 3)
+    end
 end
 
 function world:nearest(pos, incl_player)
