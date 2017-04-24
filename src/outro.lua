@@ -61,13 +61,15 @@ end
 
 local function add_ifrit()
     local player = game.state.world.entities.player
-    local pos = util.copy(player.position)
-    local dir = player:dir()
-    pos.x = pos.x + dir.x*4
-    pos.y = pos.y + dir.y*4
+    local pos = {x = player.position.x+5,
+                 y = player.position.y,
+                 z = player.position.z}
+    --local dir = player:dir()
+    --pos.x = pos.x + dir.x*4
+    --pos.y = pos.y + dir.y*4
 
     game.state.world.entities.boss = ifrit.new(pos.x, pos.y, pos.z)
-    game.state.world.entities.boss.rotation = player.rotation+math.pi
+    game.state.world.entities.boss.rotation = -math.pi*0.5
 end
 
 local function remove_ifrit()
@@ -75,7 +77,7 @@ local function remove_ifrit()
 end
 
 local function black()
-    game.black = true
+    game.state.black = true
 end
 
 local function init(i)
@@ -91,34 +93,33 @@ local function init(i)
 
     game.state.speech.text = nil
     game.state.screenshake = false
+    game.state.black = false
 
     if i == 1 then
-        return true
-    elseif i == 2 then
         screenshake()
         return true
-    elseif i == 3 then
+    elseif i == 2 then
         add_ifrit()
         screenshake()
         return true
-    elseif i == 4 then
+    elseif i == 3 then
         text('I\'ll get you!', 'djinni')
         return true
-    elseif i == 5 then
+    elseif i == 4 then
         text('You know...', 'ifrit')
         return true
-    elseif i == 6 then
+    elseif i == 5 then
         text('You and I are very alike, you know?', 'ifrit')
         sound('alike.ogg')
         return true
-    elseif i == 7 then
+    elseif i == 6 then
         text('Noooo! This can\'t be true!', 'djinni')
         sound('nonono.ogg')
         return true
-    elseif i == 8 then
+    elseif i == 7 then
         text('But then I thought to myself.', 'djinni')
         return true
-    elseif i == 9 then
+    elseif i == 8 then
         black()
         sound('outro.ogg')
         return true

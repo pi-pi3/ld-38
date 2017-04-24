@@ -51,6 +51,8 @@ function boss.new(x, y, z)
     self.defense = 666
     self.max_vel = 666
 
+    self.weight = 666666
+
     return self
 end
 

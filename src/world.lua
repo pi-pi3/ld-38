@@ -281,7 +281,7 @@ function world:update(dt)
     end
 
     if not self:has_entity('enemy') then
-        if self.stage == 0 then
+        if self.stage == 2 then
             game.state.outro = 1
         else
             self:expand(12, 12, 144*.8, 3)

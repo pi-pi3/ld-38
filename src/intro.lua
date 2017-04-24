@@ -112,7 +112,8 @@ local function init(i)
         text('...', 'djinni')
         return true
     elseif i == 10 then
-        text('I have to find him, using my mouse.', 'djinni')
+        text('I have to find him in this, using my mouse. ' ..
+             'Finding an Ifrit in a tiny lamp can\'t be hard.', 'djinni')
         return true
     elseif i == 11 then
         text('I can move with my left mouse button ' .. 
