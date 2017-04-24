@@ -89,7 +89,22 @@ function enemy:update(dt)
         end
     end
 
+    if self.sword then
+        self.sword:update(dt)
+        if not self.sword:alive() then
+            self.sword = nil
+        end
+    end
+
     entity.update(self, dt)
+end
+
+function enemy:draw()
+    if self.sword then
+        self.sword:draw()
+    end
+
+    entity.draw(self)
 end
 
 function enemy:walk()
@@ -217,8 +232,8 @@ function enemy:attack(dt, player)
         self.attacking = player
         self:run()
     else
-        if not self.sword and self.attack_timer > attack_delay then
-            --self.sword = sword.new(self)
+        if self.attack_timer > attack_delay then
+            self.sword = sword.new(self)
             self.attack_timer = 0
             self:slash()
         else

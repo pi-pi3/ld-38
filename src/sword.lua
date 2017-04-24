@@ -25,12 +25,13 @@
 local cpml = require('cpml')
 local iqm = require('iqm')
 local fireball = require('fireball')
+local anim9 = require('anim9')
 
 local sword = {}
-setmetatable(sword, {__index = entity})
+setmetatable(sword, {__index = fireball})
 local mt = {__index = sword}
 
-local time = 0.75
+local time = 16/30
 
 function sword.new(owner, mult, model, textures)
     model = model or 'sword.iqm'
@@ -49,6 +50,17 @@ function sword.new(owner, mult, model, textures)
 
     self.hits = 256
     self.dmg_falloff = 0.8
+
+    self.model.anims = iqm.load_anims('assets/models/' .. model)
+    assert(self.model.anims)
+
+    self.model.anim = anim9(self.model.anims)
+    assert(self.model.anim)
+
+    self.anim = self.model.anim:add_track('slashing')
+    self.anim.playing = true
+
+    self.model.anim:update(0)
 
     return self
 end
