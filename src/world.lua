@@ -288,6 +288,7 @@ function world:update(dt)
     end
 end
 
+-- TODO: batch blocks
 function world:draw()
     for i = 1, self.height do
         local y = i*self.scale.y+self.offset.y
