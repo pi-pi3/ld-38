@@ -37,7 +37,7 @@ function world.gen(w, h)
     self.entities = {}
     self.entities.player = player.new(0, 0, 2)
 
-    table.insert(self.entities, enemy.new(8, 8, 2))
+    self:insert(enemy.new(8, 8, 2))
 
     self.blocks = {}
     self.blocks[1] = block.new(1)
@@ -309,27 +309,39 @@ function world:nearest(pos, incl_player)
     return near.e, math.sqrt(near.d)
 end
 
-function world:insert(e)
-    table.insert(self.entities, e)
+function world:insert(e, n)
+    if n then
+        for i = 1, n do 
+            world:insert(e[i])
+        end
+    else
+        table.insert(self.entities, e)
+    end
 end
 
-function world:remove(e)
-    if type(e) == 'number' then
-        table.remove(self.entities, e)
-        return
-    end
+function world:remove(e, n)
+    if n then
+        for i = 1, n do 
+            world:remove(e[i])
+        end
+    else
+        if type(e) == 'number' then
+            table.remove(self.entities, e)
+            return
+        end
 
-    if type(e) == 'string' then
-        table[e] = nil
-        return
-    end
+        if type(e) == 'string' then
+            table[e] = nil
+            return
+        end
 
-    for k, v in pairs(self.entities) do
-        if v == e then
-            if type(k) == 'number' then
-                table.remove(self.entities, k)
-            else
-                self.entities[k] = nil
+        for k, v in pairs(self.entities) do
+            if v == e then
+                if type(k) == 'number' then
+                    table.remove(self.entities, k)
+                else
+                    self.entities[k] = nil
+                end
             end
         end
     end
