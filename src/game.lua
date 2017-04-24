@@ -27,6 +27,7 @@ local cpml = require('cpml')
 local iqm = require('iqm')
 local world = require('world')
 local intro = require('intro')
+local outro = require('outro')
 
 local game = {}
 local camera_speed = 5
@@ -87,6 +88,13 @@ function game.update(dt)
 end
 
 function game.draw()
+    if game.black then
+        return
+    end
+
+    l3d.set_depth_write(true)
+    l3d.set_depth_test('less')
+    love.graphics.setBlendMode('replace')
     gfx.set_shader(shader_static)
 
     gfx.identity()
@@ -118,9 +126,8 @@ function game.draw()
 
     game.world:draw()
     
-    if game.intro then
+    if game.intro or game.outro then
         l3d.set_depth_write(false)
-        l3d.set_culling()
         gfx.set_shader(nil)
 
         love.graphics.origin()
@@ -132,6 +139,7 @@ function game.draw()
                                  game.speech.pos.x, game.speech.pos.y,
                                  256, 'center')
         end
+
     end
 end
 
@@ -142,6 +150,14 @@ function game.keypresssed(key, scancode, isrepeat)
         else
             game.intro = false
             game.world:add_enemy(1)
+        end
+    end
+
+    if game.outro then
+        if outro(game.outro) then
+            game.outro = game.outro + 1
+        else
+            game.load()
         end
     end
 end
@@ -156,6 +172,14 @@ function game.mousepressed(mx, my, button)
         end
 
         return
+    end
+
+    if game.outro then
+        if outro(game.outro) then
+            game.outro = game.outro + 1
+        else
+            game.load()
+        end
     end
 
     local player = game.world.entities.player
@@ -187,6 +211,10 @@ function game.mousemoved(mx, my, dx, dy)
         local player = game.world.entities.player
         player:moveto(cpml.vec2(p.x, p.y))
     end
+end
+
+function game.resize(w, h)
+    game.camera.proj = gfx.projection(fov, w/h, near, far)
 end
 
 return game

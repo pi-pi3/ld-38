@@ -60,10 +60,19 @@ function player.new(x, y, z)
 
     self.rotation = math.pi
 
+    self.sound_death = love.audio.newSource('assets/sounds/player_death.ogg')
+
     return self
 end
 
 function player:update(dt)
+    if love.keyboard.isDown('a') then
+        self.spell = require('fireball')
+    end
+    if love.keyboard.isDown('d') then
+        self.spell = require('ice')
+    end
+
     if self.shooting > 0 then
         self.shooting = self.shooting - dt
     end
@@ -90,6 +99,7 @@ function player:update(dt)
     if self.dest then
         -- FIXME
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
+        dir = cpml.vec3(dir.x, dir.y, 0)
 
         local min_dist = 1
         if self.attacking then min_dist = self.range2 end

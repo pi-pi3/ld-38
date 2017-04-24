@@ -276,15 +276,18 @@ function world:update(dt)
         end
     end
 
-    if game.state.intro then
+    if game.state.intro or game.state.outro then
         return
     end
 
     if not self:has_entity('enemy') then
-        self.stage = self.stage + 1
-
-        self:expand(12, 12, 144*.8, 3)
-        self:add_enemy(self.stage * 2 + 4)
+        if self.stage == 0 then
+            game.state.outro = 1
+        else
+            self:expand(12, 12, 144*.8, 3)
+            self:add_enemy(self.stage * 2 + 4)
+            self.stage = self.stage + 1
+        end
     end
 
     if self.flag_stop then

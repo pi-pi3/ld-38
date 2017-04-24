@@ -1,5 +1,5 @@
 
---[[ intro.lua
+--[[ outro.lua
     Copyright (c) 2017 Szymon "pi_pi3" Walter, Szymon Bednarek
 
     This software is provided 'as-is', without any express or implied
@@ -25,7 +25,7 @@
 local util = require('util')
 local ifrit = require('boss')
 
-local intro = {}
+local outro = {}
 
 local function text(text, owner)
     local pos = {}
@@ -60,12 +60,22 @@ end
 end
 
 local function add_ifrit()
-    game.state.world.entities.boss = ifrit.new(5, 0, 2)
-    game.state.world.entities.boss.rotation = -math.pi*0.5
+    local player = game.state.world.entities.player
+    local pos = util.copy(player.position)
+    local dir = player:dir()
+    pos.x = pos.x + dir.x*4
+    pos.y = pos.y + dir.y*4
+
+    game.state.world.entities.boss = ifrit.new(pos.x, pos.y, pos.z)
+    game.state.world.entities.boss.rotation = player.rotation+math.pi
 end
 
 local function remove_ifrit()
     game.state.world.entities.boss = nil
+end
+
+local function black()
+    game.black = true
 end
 
 local function init(i)
@@ -83,59 +93,34 @@ local function init(i)
     game.state.screenshake = false
 
     if i == 1 then
-        text('Sigh...', 'djinni')
         return true
     elseif i == 2 then
-        text('I\'m bored.', 'djinni')
-        sound('bored.ogg')
+        screenshake()
         return true
     elseif i == 3 then
+        add_ifrit()
         screenshake()
         return true
     elseif i == 4 then
-        sound('laugh.ogg')
+        text('I\'ll get you!', 'djinni')
         return true
     elseif i == 5 then
-        add_ifrit()
+        text('You know...', 'ifrit')
         return true
     elseif i == 6 then
-        text('Now you\'re mine!', 'ifrit')
+        text('You and I are very alike, you know?', 'ifrit')
+        sound('alike.ogg')
         return true
     elseif i == 7 then
-        text('Come catch me!', 'ifrit')
-        sound('come_catch_me.ogg')
+        text('Noooo! This can\'t be true!', 'djinni')
+        sound('nonono.ogg')
         return true
     elseif i == 8 then
-        remove_ifrit()
+        text('But then I thought to myself.', 'djinni')
         return true
     elseif i == 9 then
-        text('...', 'djinni')
-        return true
-    elseif i == 10 then
-        text('I have to find him, using my mouse.', 'djinni')
-        return true
-    elseif i == 11 then
-        text('I can move with my left mouse button ' .. 
-             'and cast magic with my right mouse button', 'djinni')
-        return true
-    elseif i == 12 then
-        text('If I press an enemy with my left mouse button, ' .. 
-             'I will attack him.', 'djinni')
-        return true
-    elseif i == 13 then
-        text('I know two spells that I can use against my enemies. ' .. 
-             'The Mighty Fireball and the Powerful Ice wave.', 'djinni')
-        return true
-    elseif i == 14 then
-        text('I can switch between them with my A and D keys. ' ..
-             'Unless I\'m french. In that case it\'s Q and D. ', 'djinni')
-        return true
-    elseif i == 15 then
-        text('The fireball deals high damage and can push enemies far.', 'djinni')
-        return true
-    elseif i == 16 then
-        text('The ice wave deals lower damage, but can attack many enemies ' ..
-             'simoultaneously and it slows them down.', 'djinni')
+        black()
+        sound('outro.ogg')
         return true
     end
 
