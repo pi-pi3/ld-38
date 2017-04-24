@@ -98,6 +98,31 @@ local function init(i)
     elseif i == 8 then
         remove_ifrit(),
         return true
+    elseif i == 9 then
+        text('...', 'djinn')
+        return true
+    elseif i == 10 then
+        text('I have to find him, using my mouse.', 'djinn')
+        return true
+    elseif i == 11 then
+        text('I can move with my left mouse button' .. 
+             'and cast magic with my right mouse button', 'djinn')
+        return true
+    elseif i == 12 then
+        text('If I press an enemy with my left mouse button,' .. 
+             'I will attack him.', 'djinn')
+        return true
+    elseif i == 13 then
+        text('I know two spells that I can use against my enemies.' .. 
+             'The Mighty Fireball and the Powerful Ice wave.', 'djinn')
+        return true
+    elseif i == 14 then
+        text('The fireball deals high damage and can push enemies far.', 'djinn')
+        return true
+    elseif i == 15 then
+        text('The ice wave deals lower damage, but can attack many enemies' ..
+             'simoultaneously and it slows them down.', 'djinn')
+        return true
     end
 end
 
