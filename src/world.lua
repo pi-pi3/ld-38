@@ -45,7 +45,6 @@ function world.gen(w, h)
     self.offset = {x = -w-1, y = -h-1}
     self.width = w
     self.height = h
-    self.flag_stop = false
     self.stage = 0
 
     self.gravity = -100
@@ -288,11 +287,6 @@ function world:update(dt)
             self:add_enemy(self.stage * 2 + 4)
             self.stage = self.stage + 1
         end
-    end
-
-    if self.flag_stop then
-        game.state = require('gameover')
-        game.state.load()
     end
 end
 

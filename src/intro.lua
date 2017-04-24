@@ -87,7 +87,6 @@ local function init(i)
         return true
     elseif i == 2 then
         text('I\'m bored.', 'djinni')
-        sound('bored.ogg')
         return true
     elseif i == 3 then
         screenshake()

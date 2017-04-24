@@ -110,11 +110,9 @@ local function init(i)
         return true
     elseif i == 5 then
         text('You and I are very alike, you know?', 'ifrit')
-        sound('alike.ogg')
         return true
     elseif i == 6 then
         text('Noooo! This can\'t be true!', 'djinni')
-        sound('nonono.ogg')
         return true
     elseif i == 7 then
         text('But then I thought to myself.', 'djinni')
