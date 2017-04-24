@@ -72,6 +72,8 @@ function enemy.new(x, y, z)
     self.animation = 'none'
     self:stand()
 
+    self.sound_death = love.audio.newSource('assets/sounds/skeleton_death.ogg')
+
     return self
 end
 

@@ -102,7 +102,8 @@ local function init(i)
         text('Now you\'re mine!', 'ifrit')
         return true
     elseif i == 7 then
-        text('Come reach me!', 'ifrit')
+        text('Come catch me!', 'ifrit')
+        sound('come_catch_me.ogg')
         return true
     elseif i == 8 then
         remove_ifrit()
@@ -126,14 +127,16 @@ local function init(i)
              'The Mighty Fireball and the Powerful Ice wave.', 'djinni')
         return true
     elseif i == 14 then
-        text('The fireball deals high damage and can push enemies far.', 'djinni')
+        text('I can switch between them with my A and D keys. ' ..
+             'Unless I\'m french. In that case it\'s Q and D. ', 'djinni')
         return true
     elseif i == 15 then
+        text('The fireball deals high damage and can push enemies far.', 'djinni')
+        return true
+    elseif i == 16 then
         text('The ice wave deals lower damage, but can attack many enemies ' ..
              'simoultaneously and it slows them down.', 'djinni')
         return true
-    elseif i == 16 then
-        sound('come_catch_me.ogg')
     end
 
     return false

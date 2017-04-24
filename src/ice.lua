@@ -35,6 +35,8 @@ local mt = {__index = ice}
 
 local time = 0.75
 
+local sound_ice = love.audio.newSource('assets/sounds/ice.ogg')
+
 function ice.new(owner, mult, n, i)
     n = n or 5
     mult = mult or 1
@@ -46,9 +48,11 @@ function ice.new(owner, mult, n, i)
             t[i] = ice.new(owner, mult, 1, i)
         end
 
+        sound_ice:play()
+
         return t, n
     elseif n == 1 then
-        local self = fireball.new(owner, mult*0.15, 'ice.iqm', {'ice.tga'})
+        local self = fireball.new(owner, mult*0.15, 'ice.iqm', {'ice.tga'}, true)
         setmetatable(self, mt)
 
         self.t = 'spell.ice'

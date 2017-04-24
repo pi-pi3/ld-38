@@ -222,6 +222,10 @@ function entity:alive()
 end
 
 function entity:die(t)
+    if self.sound_death then
+        self.sound_death:play()
+    end
+
     if t then
         self.life = t
     elseif self.dying and not self.life then

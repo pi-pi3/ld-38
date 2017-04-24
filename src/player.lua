@@ -60,6 +60,8 @@ function player.new(x, y, z)
 
     self.rotation = math.pi
 
+    self.sound_death = love.audio.newSource('assets/sounds/player_death.ogg')
+
     return self
 end
 
@@ -119,6 +121,14 @@ function player:update(dt)
             game.state.camera.pos.y + self.velocity.y*dt
 
     entity.update(self, dt)
+end
+
+function player:keypressed(key)
+    if key == 'A' then
+        self.spell = require('fireball')
+    elseif key == 'D' then
+        self.spell = require('ice')
+    end
 end
 
 function player:mousepressed(mx, my, button)

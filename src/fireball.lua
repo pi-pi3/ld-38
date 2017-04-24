@@ -33,7 +33,9 @@ local mt = {__index = fireball}
 
 local time = 1.0
 
-function fireball.new(owner, mult, model, textures)
+local sound_fireball = love.audio.newSource('assets/sounds/fireball.ogg')
+
+function fireball.new(owner, mult, model, textures, quiet)
     model = model or 'fireball.iqm'
     textures = textures or {'fireball.tga'}
 
@@ -79,6 +81,10 @@ function fireball.new(owner, mult, model, textures)
     self.hits = 2
     self.hit_hash = {}
     self.dmg_falloff = 0.75
+
+    if not quiet then
+        sound_fireball:play()
+    end
 
     return self
 end
