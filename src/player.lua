@@ -38,10 +38,8 @@ local rotation_speed = 5 -- keep in sync with game.lua/camera_speed
 local attack_delay = 1
 
 function player.new(x, y, z)
-    local self = entity.new(x, y, z, 'roman.iqm', 
-                            {'djinni_body.tga', 'djinni_belt.tga', 
-                             'djinni_eye.tga', 'djinni_tail.tga'},
-                            'walking', rect.new(0, 0, 1, 1))
+    local self = entity.new(x, y, z, 'djinni.iqm', {'djinni.tga'},
+                            'idle', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'player'
@@ -96,6 +94,14 @@ function player:update(dt)
 
         if dir:len2() < min_dist then
             vx, vy = 0, 0
+            if self.walking then
+                self.model.anim:remove_track(self.walking)
+                self.walking = nil
+            end
+            if not self.idle then
+                self.idle = self.model.anim:add_track('idle')
+                self.idle.playing = true
+            end
         else
             dir = dir:normalize()
             vx = util.clamp(vx + dir.x*acc*dt, -self:stat('max_vel'), self.max_vel)
@@ -131,6 +137,15 @@ function player:moveto(x, y)
     end
 
     self.dest = pos
+    if self.idle then
+        self.model.anim:remove_track(self.idle)
+        self.idle = nil
+    end
+    if not self.walking then
+        self.walking = self.model.anim:add_track('walking')
+        self.walking.playing = true
+    end
+
     if self.shooting <= 0 then
         self:lookat(pos)
     end

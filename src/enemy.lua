@@ -48,8 +48,8 @@ local attack_delay = 1
 ]]
 
 function enemy.new(x, y, z)
-    local self = entity.new(x, y, z, 'skeleton.iqm', nil, 'standing',
-                            rect.new(0, 0, 1, 1))
+    local self = entity.new(x, y, z, 'skeleton.iqm', {'skeleton.tga', 'lamp.tga'},
+                            'standing', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
     self.t = 'enemy'
@@ -62,6 +62,7 @@ function enemy.new(x, y, z)
     self.defense = 1
     self.max_vel = 2.5
 
+    self.dying = 30
     self.follow = false
     self.state = 'idle'
     self.searching = {timer = 0,

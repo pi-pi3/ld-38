@@ -128,6 +128,7 @@ function entity:update(dt)
     if self.life then 
         self.life = self.life - dt
         if self.life < 0 then
+            self.dying = false
             self:die()
         end
     end
@@ -220,9 +221,15 @@ function entity:alive()
     return self:stat('health') > 0
 end
 
-function entity:die()
-    self.health = -1
-    game.state.world:remove(self)
+function entity:die(t)
+    if t then
+        self.life = t
+    elseif self.dying and not self.life then
+        self.life = self.dying
+    else
+        self.health = -1
+        game.state.world:remove(self)
+    end
 end
 
 function entity:on_ground()
