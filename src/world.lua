@@ -42,21 +42,173 @@ function world.gen(w, h)
     self.blocks = {}
     self.blocks[1] = block.new(1)
 
-    self.world = {} -- rename this
+    self.world = {{1, 1}, {1, 1}} -- rename this
+    self.scale = {x = 2, y = 2}
+    self.offset = {x = -13, y = -13}
     self.width = w
     self.height = h
     self.flag_stop = false
 
     self.gravity = -100
 
-    for i = 1, self.height do
-        self.world[i] = {}
-        for j = 1, self.width do
-            self.world[i][j] = 1
+    self.world = self:genpatch(w, h, w*h*0.8, 3)
+
+    return self
+end
+
+function world:expand(w, h, n, s)
+    w = w or 8
+    h = h or 8
+
+    -- Pick a random row, then pick either edge
+    local row = math.random(1, self.height)
+    local column = math.random(0, 1) * (self.height - 1) + 1
+
+    local patch = world:genpatch(w, h, n, s)
+    -- Anchor
+    local i , j = math.random(1, h), math.random(1, w)
+
+    local x0, y0 = w - j - column + 1,
+                   h - i - row + 1
+    local x1, y1 = w - j - (self.width - column),
+                   h - i - (self.height - row)
+    self.world = self:rebuild(x0, y0, x1, y1)
+
+    local off_x, off_y = 0, 0
+    if x0 < 0 then
+        off_x = self.width - (w - x1 + 1)
+    end
+    if y0 < 0 then
+        off_y = self.height - (h - y1 + 1)
+    end
+    self:attach(patch, off_x, off_y)
+end
+
+function world:attach(patch, off_x, off_y)
+    for i = 1, #patch do
+        for j = 1, #patch[i] do
+            local old_i = i+off_y
+            local old_j = j+off_x
+            if self.world[old_i] 
+                and self.world[old_i][old_j]
+                and self.world[old_i][old_j] == 0 then
+                self.world[old_i][old_j] = patch[i][j]
+            end
+        end
+    end
+end
+
+function world:rebuild(x0, y0, x1, y1)
+    local w, h = self.width+x1+x0, self.height+y1+y0
+
+    assert(w > self.width)
+    assert(h > self.height)
+
+    self.width, self.height = w, h
+
+    local new = {}
+
+    for i = 1, h do
+        new[i] = {}
+        for j = 1, w do
+            local old_i = i+y0
+            local old_j = j+x0
+            new[i][j] = self.world[old_i] and self.world[old_i][old_j] or 0
         end
     end
 
-    return self
+    return new
+end
+
+-- This function won't actually generate n blocks
+function world:genpatch(w, h, n, s)
+    local new = {}
+    local p = n/(w*h)
+
+    for i = 1, h do
+        new[i] = {}
+        for j = 1, w do
+            if math.random() < p then
+                new[i][j] = 1
+            else
+                new[i][j] = 0
+            end
+        end
+    end
+
+    local back
+    for i = 1, s do
+        -- Step cellular automaton
+        back = world:step(new)
+        -- Swap buffers
+        back, new = new, back
+    end
+
+    return new
+end
+
+function world:step(front)
+    local function neighbours(b, i, j)
+        local c = 0
+        c = c + ((b[i-1] and b[i-1][j-1] and b[i-1][j-1] > 0) and 1 or 0)
+        c = c + ((b[i-1] and b[i-1][j]   and b[i-1][j]   > 0) and 1 or 0)
+        c = c + ((b[i-1] and b[i-1][j+1] and b[i-1][j+1] > 0) and 1 or 0)
+
+        c = c + ((b[i]   and b[i][j-1]   and b[i][j-1] > 0) and 1 or 0)
+        c = c + ((b[i]   and b[i][j+1]   and b[i][j+1] > 0) and 1 or 0)
+
+        c = c + ((b[i+1] and b[i+1][j-1] and b[i+1][j-1] > 0) and 1 or 0)
+        c = c + ((b[i+1] and b[i+1][j]   and b[i+1][j]   > 0) and 1 or 0)
+        c = c + ((b[i+1] and b[i+1][j+1] and b[i+1][j+1] > 0) and 1 or 0)
+
+        return c
+    end
+
+    local function gencolor(b, i, j)
+        local c = {}
+
+        for i = i-1, i+1 do
+            local n = b[i] and b[i][j]
+            if n then
+                c[n] = (c[n] or 0) + ((n and n > 0) and 1 or 0)
+            end
+        end
+
+        local color, count = 0, 0
+        for col, n in pairs(c) do
+            if n > count then
+                color, count = col, n
+            end
+        end
+
+        return color
+    end
+
+    local back = {}
+
+    -- Rule:
+    --  every living cell with 5 or more neighbours survives
+    --  every dead cell with 7 or more neighbours gets populated
+    for i = 1, #front do
+        back[i] = {}
+        for j = 1, #front[i] do
+            local n = neighbours(front, i, j)
+
+            if front[i][j] > 0 then
+                if n < 5 then
+                    back[i][j] = 0
+                else
+                    back[i][j] = front[i][j]
+                end
+            elseif n >= 7 then
+                back[i][j] = gencolor(front, i, j)
+            else
+                back[i][j] = 0
+            end
+        end
+    end
+
+    return back
 end
 
 function world:update(dt)
@@ -74,12 +226,14 @@ end
 
 function world:draw()
     for i = 1, self.height do
-        local y = i*2-9
+        local y = i*self.scale.y+self.offset.y
         for j = 1, self.width do
-            local x = j*2-9
+            local x = j*self.scale.x+self.offset.x
             local t = self.world[i][j]
 
-            self.blocks[t]:draw(x, y)
+            if t > 0 then
+                self.blocks[t]:draw(x, y)
+            end
         end
     end
 

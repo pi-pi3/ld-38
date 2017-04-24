@@ -54,7 +54,7 @@ function game.load()
 
     local width, height = love.graphics.getDimensions()
 
-    local w, h = 8, 8
+    local w, h = 12, 12
     game.world = world.gen(w, h)
     game.camera = {pos = cpml.vec3(0, 8, 12),
                    rot = cpml.vec3(theta, 0, 0),
