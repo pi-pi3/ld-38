@@ -66,6 +66,13 @@ function player.new(x, y, z)
 end
 
 function player:update(dt)
+    if love.keyboard.isDown('a') then
+        self.spell = require('fireball')
+    end
+    if love.keyboard.isDown('d') then
+        self.spell = require('ice')
+    end
+
     if self.shooting > 0 then
         self.shooting = self.shooting - dt
     end
@@ -92,6 +99,7 @@ function player:update(dt)
     if self.dest then
         -- FIXME
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
+        dir = cpml.vec3(dir.x, dir.y, 0)
 
         local min_dist = 1
         if self.attacking then min_dist = self.range2 end
@@ -121,14 +129,6 @@ function player:update(dt)
             game.state.camera.pos.y + self.velocity.y*dt
 
     entity.update(self, dt)
-end
-
-function player:keypressed(key)
-    if key == 'A' then
-        self.spell = require('fireball')
-    elseif key == 'D' then
-        self.spell = require('ice')
-    end
 end
 
 function player:mousepressed(mx, my, button)
