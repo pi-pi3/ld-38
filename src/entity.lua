@@ -120,6 +120,12 @@ function entity:update(dt)
 
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
+    if self.life then 
+        self.life = self.time - dt
+        if self.life < 0 then
+            self:die()
+        end
+    end
 
     -- Update velocity
     if self.force then
@@ -150,7 +156,7 @@ function entity:update(dt)
             self.velocity.z = self.velocity.z + game.state.world.gravity*dt
             self.position.z = self.position.z + self.velocity.z*dt
 
-            if self.position.z < -128 then
+            if self.position.z < -80 then
                 self:die()
             end
         end

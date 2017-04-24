@@ -48,7 +48,7 @@ function player.new(x, y, z)
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = 8
+    self.strength = -8
     self.power = 20
     self.agility = 5
     self.defense = 5
@@ -63,9 +63,6 @@ function player.new(x, y, z)
 end
 
 function player:update(dt)
-    self.timer = self.timer + dt
-    self.attack_timer = self.attack_timer + dt
-
     if self.shooting > 0 then
         self.shooting = self.shooting - dt
     end
@@ -75,7 +72,9 @@ function player:update(dt)
             self.dest = cpml.vec2(self.attacking.position.x, self.attacking.position.y)
         end
 
-        if self.attack_timer > attack_delay then
+        if self.attack_timer > attack_delay
+            and cpml.vec2.dist2(self.attacking.position, self.position)
+                < self.range2 then
             game.state.world:insert(fireball.new(self))
             self.attack_timer = 0
         end
@@ -95,7 +94,6 @@ function player:update(dt)
         if self.attacking then min_dist = self.range2 end
 
         if dir:len2() < min_dist then
-            self.dest = nil
             vx, vy = 0, 0
         else
             dir = dir:normalize()
