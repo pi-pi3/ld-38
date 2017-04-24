@@ -73,6 +73,9 @@ function fireball.new(owner, mult)
         self.pushback_power = owner.power*scale*1000
     end
 
+    self.hits = 2
+    self.hit_hash = {}
+
     return self
 end
 
@@ -83,16 +86,25 @@ function fireball:update(dt)
         if e ~= self.owner and e ~= self then
             if self:collision(e) then
                 self:hit(e)
-                game.state.world:remove(self)
+                self.hits = self.hits - 1
+                self.dmg = self.dmg*0.75
                 return
             end
         end
     end
 
     entity.update(self, dt)
+
+    if self.hits <= 0 then
+        game.state.world:remove(self)
+    end
 end
 
 function fireball:collision(e)
+    if self.hit_hash[e] then
+        return false
+    end
+
     local d = e.position - self.position
     d = cpml.vec2(d.x, d.y)
 
@@ -101,6 +113,7 @@ end
 
 function fireball:hit(e)
     e.health = e.health - (self.dmg - e.defense)
+    self.hit_hash[e] = true
     if self.pushback_power then
         local d = e.position - self.owner.position
         e:pushback(d:normalize()*self.pushback_power)
