@@ -2,6 +2,9 @@ Todo:
 [ ] Batch blocks
 [ ] Implement stagger
 [ ] Balance pushback
-[ ] Fix enemy searching
+[ ] Skele death animation
 
 Bugs:
+[ ] Fix skeleton attack animation
+[ ] Fix enemy searching
+[ ] Fix player walking to dest
