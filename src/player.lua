@@ -136,4 +136,8 @@ function player:moveto(x, y)
     end
 end
 
+function player:die()
+    game.state.world.flag_stop = true
+end
+
 return player

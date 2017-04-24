@@ -45,8 +45,9 @@ function world.gen(w, h)
     self.world = {} -- rename this
     self.width = w
     self.height = h
+    self.flag_stop = false
 
-    self.gravity = -3000.0
+    self.gravity = -100
 
     for i = 1, self.height do
         self.world[i] = {}
@@ -63,6 +64,11 @@ function world:update(dt)
         if e.update then
             e:update(dt)
         end
+    end
+
+    if self.flag_stop then
+        game.state = require('gameover')
+        game.state.load()
     end
 end
 

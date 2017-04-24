@@ -150,7 +150,7 @@ function entity:update(dt)
             self.velocity.z = self.velocity.z + game.state.world.gravity*dt
             self.position.z = self.position.z + self.velocity.z*dt
 
-            if self.position.z < 64 then
+            if self.position.z < -128 then
                 self:die()
             end
         end
