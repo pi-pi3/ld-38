@@ -26,6 +26,7 @@ local util = require('util')
 local cpml = require('cpml')
 local iqm = require('iqm')
 local world = require('world')
+local intro = require('intro')
 
 local game = {}
 local camera_speed = 5
@@ -56,7 +57,6 @@ function game.load()
 
     local w, h = 12, 12
     game.world = world.gen(w, h)
-    game.world:add_enemy(4)
     game.camera = {pos = cpml.vec3(0, 8, 12),
                    rot = cpml.vec3(theta, 0, 0),
                    proj = gfx.projection(fov, width/height, near, far)}
@@ -68,6 +68,10 @@ function game.load()
     game.skybox.textures = {
         Materialskybox = skybox
     }
+
+    game.intro = 1
+    game.speech = {text = nil, pos = nil}
+    game.screenshake = false
 end
 
 function game.update(dt)
@@ -99,9 +103,42 @@ function game.draw()
                game.camera.proj)
 
     game.world:draw()
+    
+    if game.intro then
+        l3d.set_depth_write(false)
+        gfx.set_shader(nil)
+
+        if game.speech.text then
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.printf(game.speech.text,
+                                 game.speech.pos.x, game.speech.pos.y)
+        end
+    end
+end
+
+function game.keypresssed(key, scancode, isrepeat)
+    if game.intro then
+        if intro(game.intro) then
+            game.intro = game.intro + 1
+        else
+            game.intro = false
+            game.world:add_enemy(1)
+        end
+    end
 end
 
 function game.mousepressed(mx, my, button)
+    if game.intro then
+        if intro(game.intro) then
+            game.intro = game.intro + 1
+        else
+            game.intro = false
+            game.world:add_enemy(1)
+        end
+
+        return
+    end
+
     local player = game.world.entities.player
     local p = gfx.unproject(mx, my, math.rad(fov), near, far,
                             gfx.matrix())

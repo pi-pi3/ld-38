@@ -277,9 +277,10 @@ function world:update(dt)
     end
 
     if not self:has_entity('enemy') then
+        self.stage = self.stage + 1
+
         self:expand(12, 12, 144*.8, 3)
         self:add_enemy(self.stage * 2 + 4)
-        self.stage = self.stage + 1
     end
 
     if self.flag_stop then
