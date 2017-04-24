@@ -30,6 +30,7 @@ local mt = {__index = sword}
 
 local time = 0.75
 
+-- TODO: entity + anim
 function sword.new(owner, mult)
     local self = {}
     setmetatable(self, mt)
