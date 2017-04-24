@@ -34,6 +34,7 @@ local mt = {__index = fireball}
 local time = 1.0
 
 local sound_fireball = love.audio.newSource('assets/sounds/fireball.ogg')
+sound_fireball:setLooping(false)
 
 function fireball.new(owner, mult, model, textures, quiet)
     model = model or 'fireball.iqm'

@@ -36,6 +36,7 @@ local mt = {__index = ice}
 local time = 0.75
 
 local sound_ice = love.audio.newSource('assets/sounds/ice.ogg')
+sound_ice:setLooping(false)
 
 function ice.new(owner, mult, n, i)
     n = n or 5

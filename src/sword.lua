@@ -37,13 +37,14 @@ function sword.new(owner, mult, model, textures)
     model = model or 'sword.iqm'
     textures = textures or {'sword.tga'}
 
-    local self = fireball.new(owner, mult, model, textures)
+    local self = fireball.new(owner, mult, model, textures, true)
     setmetatable(self, mt)
 
     self.t = 'spell.sword'
     self.life = time
 
     self.rotation = owner.rotation
+    self.radius2 = 6.5
 
     self.max_vel = 0.0
     self.velocity = cpml.vec2(0, 0)
@@ -68,18 +69,6 @@ end
 function sword:update(dt)
     fireball.update(self, dt)
     self.position = self.owner.position
-end
-
-function sword:collision(e)
-    local d = e.position - self.owner.position
-    d = cpml.vec2(d.x, d.y)
-
-    if d:len2() < self.radius2 then
-        local v = self.owner:dir()
-        local theta = math.pi-cpml.vec2.dot(d, v)
-
-        return math.abs(theta-self.rotation) < math.pi*0.0625
-    end
 end
 
 return sword

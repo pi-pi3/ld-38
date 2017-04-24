@@ -123,6 +123,10 @@ function entity:update(dt)
         self.model.anim:update(dt)
     end
 
+    if self.health <= 0 then
+        self:die()
+    end
+
     self.timer = self.timer + dt
     self.attack_timer = self.attack_timer + dt
     if self.life then 
