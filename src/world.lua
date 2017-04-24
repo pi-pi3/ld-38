@@ -115,9 +115,18 @@ function world:remove(e)
         return
     end
 
+    if type(e) == 'string' then
+        table[e] = nil
+        return
+    end
+
     for k, v in pairs(self.entities) do
         if v == e then
-            table.remove(self.entities, k)
+            if type(k) == 'number' then
+                table.remove(self.entities, k)
+            else
+                self.entities[k] = nil
+            end
         end
     end
 end
