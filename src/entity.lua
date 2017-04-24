@@ -209,7 +209,7 @@ end
 
 local function p_on_ground(px, py, ox, oy)
     local world = game.state.world.world
-    return world[py+oy] and world[py+oy][px+ox] and true or false
+    return world[py+oy] and world[py+oy][px+ox] and world[py+oy][px+ox] > 0 or false
 end
 
 function entity:on_ground()
@@ -217,8 +217,8 @@ function entity:on_ground()
         return false
     end
 
-    local px, py = math.floor((self.position.x+9)*0.5),
-                   math.floor((self.position.y+9)*0.5)
+    local px, py = math.ceil((self.position.x+9)*0.5)+1,
+                   math.ceil((self.position.y+9)*0.5)+1
 
     local on_ground = p_on_ground(px, py, 0, 0)
                    or p_on_ground(px, py, self.bbox.w, 0)
