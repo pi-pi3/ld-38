@@ -88,6 +88,7 @@ function player:update(dt)
     local vx, vy = self.velocity.x, self.velocity.y 
     -- Goto dest
     if self.dest then
+        -- FIXME
         local dir = (self.dest - cpml.vec2(self.position.x, self.position.y))
 
         local min_dist = 1

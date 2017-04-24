@@ -287,9 +287,9 @@ end
 function world:mousepressed(mx, my, button)
     self.entities.player:mousepressed(mx, my, button)
 
-    if button == 3 then
-        self:expand(12, 12, 144*.8, 3)
-    end
+    --if button == 3 then -- DEBUG
+    --    self:expand(12, 12, 144*.9, 3)
+    --end
 end
 
 function world:nearest(pos, incl_player)
