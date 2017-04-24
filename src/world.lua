@@ -37,8 +37,6 @@ function world.gen(w, h)
     self.entities = {}
     self.entities.player = player.new(0, 0, 2)
 
-    self:insert(enemy.new(8, 8, 2))
-
     self.blocks = {}
     self.blocks[1] = block.new(1)
 
@@ -48,12 +46,33 @@ function world.gen(w, h)
     self.width = w
     self.height = h
     self.flag_stop = false
+    self.stage = 0
 
     self.gravity = -100
 
     self.world = self:genpatch(w, h, w*h*0.8, 3)
 
     return self
+end
+
+function world:add_enemy(n)
+    assert(n)
+    local w, h = self.width, self.height
+
+    for i = 1, n do
+        local x, y = 0, 0
+        local e = enemy.new(x, y, 2)
+        while true do
+            x, y = math.random(-w, w), math.random(-h, h)
+            e.position.x = x
+            e.position.y = y
+
+            if e:on_ground() then
+                break
+            end
+        end
+        self:insert(e)
+    end
 end
 
 function world:expand(w, h, n, s)
@@ -115,7 +134,6 @@ function world:expand(w, h, n, s)
 end
 
 function world:attach(patch, off_x, off_y)
-    print(off_x, off_y)
     for i = 1, #patch do
         for j = 1, #patch[i] do
             local old_i = i+off_y
@@ -258,6 +276,12 @@ function world:update(dt)
         end
     end
 
+    if not self:has_entity('enemy') then
+        self:expand(12, 12, 144*.8, 3)
+        self:add_enemy(self.stage * 2 + 4)
+        self.stage = self.stage + 1
+    end
+
     if self.flag_stop then
         game.state = require('gameover')
         game.state.load()
@@ -287,9 +311,6 @@ end
 function world:mousepressed(mx, my, button)
     self.entities.player:mousepressed(mx, my, button)
 
-    if button == 3 then -- DEBUG
-        self:expand(12, 12, 144*.9, 3)
-    end
 end
 
 function world:nearest(pos, incl_player)
@@ -311,7 +332,7 @@ end
 
 function world:insert(e, n)
     if n then
-        for i = 1, n do 
+        for i = 1, n do
             world:insert(e[i])
         end
     else
@@ -345,6 +366,26 @@ function world:remove(e, n)
             end
         end
     end
+end
+
+function world:has_entity(t)
+    for _, e in pairs(self.entities) do
+        if util.startswith(e.t, t) then
+            return true
+        end
+    end
+end
+
+function world:enemy_count()
+    local count = 0
+
+    for _, e in pairs(self.entities) do
+        if util.startswith(e.t, 'enemy') then
+            count = count + 1
+        end
+    end
+
+    return count
 end
 
 return world

@@ -48,7 +48,7 @@ function player.new(x, y, z)
 
     self.health = 42 -- The answer to life, the universe and everything.
     self.health_max = 42
-    self.strength = -8
+    self.strength = 8
     self.power = 20
     self.agility = 5
     self.defense = 5
@@ -130,7 +130,7 @@ function player:moveto(x, y)
     end
 
     self.dest = pos
-    if self.shooting == 0 then
+    if self.shooting <= 0 then
         self:lookat(pos)
     end
 end

@@ -82,6 +82,8 @@ function entity.new(x, y, z, model, textures, anim, bbox)
 
             self.anim = self.model.anim:add_track(anim)
             self.anim.playing = true
+
+            self.model.anim:update(0)
         end
     end
 
