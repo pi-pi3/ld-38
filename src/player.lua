@@ -58,6 +58,8 @@ function player.new(x, y, z)
     self.shooting = 0
     self.spell = require('fireball')
 
+    self.rotation = math.pi
+
     return self
 end
 

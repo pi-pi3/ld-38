@@ -34,7 +34,7 @@ local mt = {__index = boss}
 local attack_delay = 0.666
 
 function boss.new(x, y, z)
-    local self = entity.new(x, y, z, 'djinni.iqm', {'ifrit.tga'},
+    local self = entity.new(x, y, z, 'ifrit.iqm', {'ifrit.tga'},
                             'idle', rect.new(0, 0, 1, 1))
     setmetatable(self, mt)
 
