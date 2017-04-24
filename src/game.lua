@@ -144,6 +144,10 @@ function game.draw()
                                  256, 'center')
         end
 
+        l3d.set_depth_write(true)
+        gfx.set_shader(shader_static)
+
+        love.graphics.setBlendMode('replace')
     end
 end
 
