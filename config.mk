@@ -1,7 +1,7 @@
 
 VERSION = 0.1
 GAME = minor-madness
-AUTHOR = pi_pi3
+AUTHOR = pi-pi3
 ITCH = $(AUTHOR)
 
 LINUX_PATH = release/linux
