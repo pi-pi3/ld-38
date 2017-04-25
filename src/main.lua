@@ -49,6 +49,10 @@ function love.load()
     -- screen for example
     game.state = require('game')
     game.state.load()
+
+    local background = love.audio.newSource('assets/sounds/background.ogg')
+    background:setLooping(true)
+    background:play()
 end
 
 

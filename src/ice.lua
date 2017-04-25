@@ -59,7 +59,7 @@ function ice.new(owner, mult, n, i)
         self.t = 'spell.ice'
         self.life = time
 
-        local rot = math.pi*0.133*(i+0.5) - math.pi*0.5
+        local rot = math.pi*0.133*(i+1) - math.pi*0.5
         self.rotation = owner.rotation + rot
 
         self.max_vel = 40.0
