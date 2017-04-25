@@ -41,3 +41,4 @@ Btw, I hate Alladin. _Firetruck_ that guy.
 ## Changelog:
 **25/04/17** - Fixed Ice Wave direction offset.
              - Background theme no longer plays twice.
+             - Fix outro volume.
