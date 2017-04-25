@@ -1,5 +1,5 @@
 
-VERSION = 0.1
+VERSION = 0.1a
 GAME = minor-madness
 AUTHOR = pi-pi3
 ITCH = $(AUTHOR)
